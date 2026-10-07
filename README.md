@@ -96,7 +96,7 @@ Decisões em relação ao legado:
 - **R01 (sequence):** contador atômico começando em **3400**. A sequence do SQL começa em 3397, mas 3397–3399 já existem nos dados, então o legado colidiria na primeira inclusão.
 - **R08 (cadastrador):** vem do `sub` do token Cognito, nunca do corpo da requisição.
 - **Km Atual (R16):** não criamos a regra "km da lavagem ≤ Km Atual". Nos dados do SQL, 2 das 3 lavagens já passam do Km Atual (que no sistema real vem de outro módulo e pode estar desatualizado).
-- **CNPJ (R14):** além de exigir o CNPJ, como o gabarito pede, validamos o dígito verificador em toda inclusão e alteração (extra nosso). O CNPJ do SQL (`12.345.678/0001-90`) é inválido no dígito; o registro 3398 fica como está na carga, e só precisa ser corrigido se alguém editá-lo.
+- **CNPJ (R14):** além de exigir o CNPJ, como o gabarito pede, validamos o dígito verificador em toda inclusão e alteração (extra nosso). O CNPJ do SQL (`12.345.678/0001-90`) é inválido no dígito. No `gabarito` ele fica igual ao SQL, por ser a fixture dos testes; no `demo`, que só traz dados já validados pelo sistema, a 3398 usa `12.345.678/0001-95`.
 - **Limites das colunas:** valor até R$ 999,99 (`NUMBER(5,2)`) e km até 999.999 (`NUMBER(6,0)`).
 
 ## Dados sintéticos (`data/seed/`)
