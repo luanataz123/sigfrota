@@ -448,7 +448,7 @@ describe('gabarito', () => {
 });
 
 describe('tabela', () => {
-  test('--criar-tabela cria com PK/SK string, PAY_PER_REQUEST, SSE e espera ACTIVE', async () => {
+  test('--criar-tabela cria com PK/SK string, PAY_PER_REQUEST, criptografia padrão e espera ACTIVE', async () => {
     const fake = clienteFake({ tabelaExiste: false });
     let esperou = '';
     const r = await garantirTabela(fake, 't', { criar: true, esperarTabelaAtiva: async (n) => { esperou = n; } });

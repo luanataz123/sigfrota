@@ -267,7 +267,7 @@ export async function limparTabela(doc, tabela, opcoes = {}) {
 }
 
 /**
- * Confere se a tabela existe; com `criar`, cria (PK/SK string, PAY_PER_REQUEST, SSE).
+ * Confere se a tabela existe; com `criar`, cria (PK/SK string, PAY_PER_REQUEST, criptografia padrão).
  * --criar-tabela é atalho para começar antes da IaC: depois, a fonte da verdade
  * da tabela é o CDK/SAM, e o script só carrega dados.
  */
@@ -382,7 +382,7 @@ export async function executar(argv, deps) {
       criar: opcoes.criarTabela,
       esperarTabelaAtiva: clientes.esperarTabelaAtiva ?? deps.esperarTabelaAtiva,
     });
-    if (criada) log(`Tabela ${opcoes.tabela} criada (PAY_PER_REQUEST, SSE). Depois, a tabela deve vir da IaC.`);
+    if (criada) log(`Tabela ${opcoes.tabela} criada (PAY_PER_REQUEST, criptografia padrão da AWS). Depois, a tabela deve vir da IaC.`);
 
     let apagados = 0;
     let reenvios = 0;
