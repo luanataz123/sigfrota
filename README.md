@@ -21,7 +21,7 @@ O atendente abre a tela de um veículo, clica em **Incluir Lavagem**, preenche o
 | `lavagem-sintetico.sql` | DDL + dados fictícios (`FR_LAVAGEM`, `FR_TIPO_LAVAGEM`, mocks de veículo e posto) |
 | `lavagem-apex-trecho-ilustrativo.md` | Trechos PL/SQL do APEX: o "antes" da migração |
 | `lavagem-gabarito-regras.md` | Gabarito com as regras R01–R23 e casos de teste |
-| `INSTRUÇÃO NORMATIVA SGMPF Nº 29/2023.pdf` | Norma de uso da frota (contexto de domínio) |
+| `INSTRUÇÃO NORMATIVA SGMPF Nº 29/2023.pdf` | Acessibilidade (e-MAG/WCAG): soluções do MPF só entram em produção com nota ≥ 70% na verificação automatizada ("parcialmente acessível") e análise humana |
 | `Orientação Técnica nº 17 - Privacidade desde o projeto.pdf` | Privacy by Design / LGPD |
 | `../criterios-avaliacao-hackathon.html` | Critérios de avaliação da banca |
 
@@ -46,7 +46,7 @@ O atendente abre a tela de um veículo, clica em **Incluir Lavagem**, preenche o
 |---|----------|--------------------------|
 | 1 | Atendimento aos Requisitos | Cobrir R01–R23, demo ponta a ponta com os dados sintéticos, casos de teste do gabarito passando |
 | 2 | Arquitetura AWS | Serverless (Lambda, API Gateway, S3, DynamoDB), eventos (S3 → Step Functions), IaC (SAM ou CDK), Bedrock nas features de IA |
-| 3 | Inovação e Criatividade | Specs, hooks e steering do Kiro como parte do processo; UX simples para o atendente |
+| 3 | Inovação e Criatividade | Specs, hooks e steering do Kiro como parte do processo; UX simples e acessível para o atendente (e-MAG/WCAG, IN SGMPF nº 29/2023) |
 | 4 | Segurança | Cognito, IAM com menor privilégio, validação de entrada, dados sensíveis fora de logs, criptografia em trânsito e em repouso, LGPD (Privacy by Design, OT nº 17) |
 | 5 | Apresentação | Problema → solução → demo → resultados → próximos passos, dentro de 5 min |
 | 6 | Viabilidade e Escalabilidade | Caminho MVP → produção, estimativa de custo, reuso por outros módulos/órgãos, testes e documentação |
@@ -65,20 +65,62 @@ O atendente abre a tela de um veículo, clica em **Incluir Lavagem**, preenche o
 
 ### Modelagem no DynamoDB
 
-O padrão de acesso principal é listar as lavagens de um veículo ordenadas por data (R19).
+Uma tabela, três tipos de partição (catálogo, lavagens por veículo e contador) e nenhum GSI no MVP. Todas as buscas são `Query` ou `GetItem`, sem `Scan`.
 
 | PK | SK | Item |
 |----|----|------|
-| `VEICULO#101` | `META` | dados do veículo, `KM_ATUAL` |
-| `VEICULO#101` | `LAVAGEM#2026-09-01#3397` | lavagem |
-| `TIPO#2` | `META` | tipo de lavagem |
-| `POSTO#10` | `META` | posto conveniado |
+| `CATALOGO` | `VEICULO#101` | veículo: descrição, placa, `kmAtual` |
+| `CATALOGO` | `TIPO#2` | tipo de lavagem |
+| `CATALOGO` | `POSTO#10` | posto conveniado |
+| `VEICULO#101` | `LAVAGEM#3397` | lavagem |
+| `CONTADOR` | `LAVAGEM` | último ID gerado |
+
+| Busca | Operação |
+|-------|----------|
+| Carregar veículos, tipos e postos (tela inicial e combos do formulário) | `Query PK = CATALOGO` (poucas dezenas de itens) |
+| Lavagens do veículo (R19) | `Query PK = VEICULO#id, SK begins_with LAVAGEM#`; ordenação por data na Lambda |
+| Abrir uma lavagem para edição (R21) | `GetItem PK = VEICULO#id, SK = LAVAGEM#idLavagem` |
+| Gerar novo ID (R01) | `UpdateItem` com `ADD` no item `CONTADOR` |
+
+Por que assim:
+
+- **SK pelo ID, não pela data:** editar a data não muda a chave, então update é um `PutItem` simples, sem transação. Um veículo tem poucas dezenas de lavagens, e ordenar isso na Lambda é trivial.
+- **Rota com o veículo:** `/veiculos/{idVeiculo}/lavagens/{idLavagem}` já traz a PK, o que dispensa um GSI pelo ID.
+- **`dsTipoLavagem` gravado na lavagem:** a listagem (R20) sai de uma única `Query`, sem "join".
+- **`propriaUnidade` e `postoConveniado` gravados como booleanos:** a regra condicional (R09–R14) fica explícita no dado, sem precisar deduzir pelos campos vazios.
+- **Painel do gestor:** se entrar no escopo, um GSI por mês (`MES#2026-09`). Fora do MVP até lá.
 
 Decisões em relação ao legado:
 
-- **R05–R07 (FKs):** o DynamoDB não tem chave estrangeira; a existência de tipo, veículo e posto é verificada no service.
-- **R01 (sequence):** substituída por contador atômico (`UpdateItem` com `ADD`), mantendo IDs numéricos como no legado.
+- **R05–R07 (FKs):** o DynamoDB não tem chave estrangeira; a existência de tipo, veículo e posto é verificada no service, contra o catálogo.
+- **R01 (sequence):** contador atômico começando em **3400**. A sequence do SQL começa em 3397, mas 3397–3399 já existem nos dados, então o legado colidiria na primeira inclusão.
 - **R08 (cadastrador):** vem do `sub` do token Cognito, nunca do corpo da requisição.
+- **Km Atual (R16):** não criamos a regra "km da lavagem ≤ Km Atual". Nos dados do SQL, 2 das 3 lavagens já passam do Km Atual (que no sistema real vem de outro módulo e pode estar desatualizado).
+- **CNPJ (R14):** além de exigir o CNPJ, como o gabarito pede, validamos o dígito verificador em toda inclusão e alteração (extra nosso). O CNPJ do SQL (`12.345.678/0001-90`) é inválido no dígito. No `gabarito` ele fica igual ao SQL, por ser a fixture dos testes; no `demo`, que só traz dados já validados pelo sistema, a 3398 usa `12.345.678/0001-95`.
+- **Limites das colunas:** valor até R$ 999,99 (`NUMBER(5,2)`) e km até 999.999 (`NUMBER(6,0)`).
+
+## Dados sintéticos (`data/seed/`)
+
+Não temos acesso aos dados reais. Um script Node.js com semente fixa no gerador aleatório gera JSON já no formato da tabela acima (a única dependência é a conversão das imagens de recibo para PNG). Todo mundo obtém os mesmos dados.
+
+| Conjunto | Conteúdo | Uso |
+|----------|----------|-----|
+| `gabarito` | Exatamente os registros do SQL: 3 tipos, 3 veículos, 2 postos, 3 lavagens | Testes do gabarito (o veículo 101 precisa ter só 1 lavagem) |
+| `demo` | O gabarito mais 15 veículos (18 no total), 4 postos conveniados (6 no total), 5 não conveniados e ~250 lavagens (Out/2025 a Set/2026) | Demo e desenvolvimento |
+| `anomalias` | 7 lavagens suspeitas plantadas no `demo`, listadas num manifesto | Medir a detecção de anomalias (ideia 3) |
+| `recibos` | 8 imagens de recibo fictícias (PNG, marcadas "DOCUMENTO FICTÍCIO") + o JSON esperado de cada uma | Medir a leitura do recibo (ideia 2) |
+
+Coerência do `demo`: km crescente por veículo, uma lavagem por veículo por dia, ~40% internas e ~60% externas (das externas, ~75% em posto conveniado), valores dentro da faixa de cada tipo, CNPJs novos com dígito válido, IDs novos a partir de 3400, nenhuma data futura, cadastradores só por ID (9001–9004, sem nomes nem CPF).
+
+Anomalias plantadas: valor três vezes acima da média do tipo, duas lavagens do mesmo veículo no mesmo dia e km menor que na lavagem anterior. Continuam válidas pelas regras do gabarito: são suspeitas de negócio, não erros de validação. Fora delas, nenhum dado pode disparar esses critérios.
+
+Recibos: cada um corresponde a uma lavagem externa do `demo` (valor, data, posto e CNPJ). O JSON esperado permite comparar campo a campo o que o Bedrock extraiu. As imagens são geradas como SVG pelo script e convertidas para PNG, formato aceito pelo Bedrock.
+
+Para desenvolver rápido:
+
+- **Front sem esperar a API:** o React lê os JSON do `demo` como mock até as Lambdas ficarem prontas.
+- **Domínio sem AWS:** os testes do `packages/dominio` rodam contra o `gabarito`, direto no Node.
+- **Uma carga só:** um script com `BatchWriteItem` popula a tabela a partir do mesmo JSON.
 
 ## Ideias de IA (candidatas)
 
@@ -133,6 +175,7 @@ services/api/          # spec 3
 services/ia-regras/    # spec 5
 services/ia-recibo/    # spec 6
 web/                   # spec 4 — React + Tailwind
+data/seed/             # dados sintéticos (gabarito e demo)
 docs/                  # insumos do hackathon
 ```
 

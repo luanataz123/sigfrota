@@ -2,10 +2,12 @@
   "name": "sigfrota",
   "version": "0.1.0",
   "private": true,
-  "description": "SIG Frota - monorepo (migração APEX -> AWS serverless)",
+  "description": "SIG Frota — módulo de Lavagem (monorepo, migração APEX -> AWS serverless)",
   "workspaces": [
-    "web",
-    "packages/*"
+    "infra",
+    "packages/*",
+    "services/*",
+    "web"
   ],
   "scripts": {
     "dev": "npm run dev --workspace web",
