@@ -40,11 +40,18 @@ Requisitos de origem: ver `requirementsK.md`. Regras de origem: ver
 │  Repository / Data Access                                     │
 │   lavagemRepo, tipoLavagemRepo, veiculoRepo, postoRepo        │
 └───────────────────────────┬─────────────────────────────────┘
-                            │ SQL
+                            │ AWS SDK (DocumentClient)
 ┌───────────────────────────▼─────────────────────────────────┐
-│  Banco  SQLite em memória (MVP) — DDL de lavagem-sintetico.sql │
+│  Amazon DynamoDB — tabela única PK/SK                         │
+│   PAY_PER_REQUEST, KMS, PITR (ver spec infra-base)            │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+> **Nota de alinhamento:** a persistência oficial do projeto é o **Amazon
+> DynamoDB** (tabela única PK/SK), provisionado pela spec `infra-base`. As regras
+> de negócio (R01–R23) permanecem no backend Node; o repositório troca o acesso
+> SQL por operações DynamoDB. O `lavagem-sintetico.sql` continua sendo a **fonte
+> da estrutura e dos dados fictícios**, mapeada para itens PK/SK na carga.
 
 ### Decisões técnicas
 
@@ -55,15 +62,18 @@ Requisitos de origem: ver `requirementsK.md`. Regras de origem: ver
 | Front-end | React 18 + Vite | SPA leve; Vite para dev/build rápidos. |
 | Estilo | Tailwind CSS | Utilitário; facilita foco/contraste acessível. |
 | Validação | Zod (ou Joi) no backend | Esquema de entrada + regras estruturais; condicionais no service. |
-| Persistência | SQLite em memória (better-sqlite3) | MVP autocontido; DDL fiel ao `lavagem-sintetico.sql`. |
+| Persistência | Amazon DynamoDB (tabela única PK/SK) | Arquitetura oficial da spec `infra-base`; on-demand, KMS, PITR. |
+| Execução do backend | AWS Lambda (Node) atrás de API Gateway HTTP API | Serverless; a lógica Express/handlers roda em Lambda. |
 | Testes | Vitest/Jest (service) + Supertest (API) + RTL (React) | Cobertura das regras do gabarito. |
-| Km atual | Mock via `FR_VEICULO_MOCK.KM_ATUAL` | R16 — módulo de Atendimento fora de escopo. |
-| Autenticação | Usuário fixo/mock | Cognito não exigido no MVP (caso de uso, seção 9). |
+| Km atual | Mock via item de veículo (`KM_ATUAL`) | R16 — módulo de Atendimento fora de escopo. |
+| Autenticação | Amazon Cognito (grupos atendente/gestor) | Definida na spec `infra-base`; JWT no API Gateway. |
 
 ## Arquitetura AWS (Requisito 10 — critério C2)
 
-O MVP roda localmente (Node + SQLite), mas a solução se insere num desenho AWS
-com serviços gerenciados. O serviço essencial é o **Amazon Bedrock**.
+A solução é implantada na AWS pela spec `infra-base` (AWS CDK + cdk-nag,
+`us-east-1`), com serviços gerenciados serverless. O serviço de IA essencial é o
+**Amazon Bedrock**. Para desenvolvimento local, o backend Node pode rodar com
+DynamoDB Local, mantendo o mesmo repositório.
 
 ### Papel do Bedrock (extração + geração)
 
@@ -87,39 +97,47 @@ docs/*gabarito*.md          ─┘    (prompt com os SQL)       natural + rastre
 - Acesso ao Bedrock pela AWS CLI/SDK usa o profile `sigfrota` (ver
   `.kiro/steering/aws-credenciaisK.md`).
 
-### Caminho de produção (serviços gerenciados)
+### Desenho na AWS (serviços gerenciados — spec `infra-base`)
 
 ```
-Navegador ──HTTPS──▶ API Gateway ──▶ Lambda (Node) / ECS Fargate
-                                        │
-                                        ├─▶ Amazon Bedrock (extração/geração)
-                                        ├─▶ RDS/Aurora (FR_LAVAGEM real)
-                                        └─▶ S3 (artefatos SQL de entrada)
-   Cognito (autenticação) ─────────────┘
-   IaC: SAM / CDK / CloudFormation      Observabilidade: CloudWatch
+Navegador ──HTTPS──▶ CloudFront (+ S3 privado via OAC: SPA React)
+     │
+     ├─ login OIDC ─▶ Amazon Cognito (grupos atendente/gestor)
+     │
+     └─ REST + JWT ─▶ API Gateway HTTP API (authorizer JWT)
+                           │
+                           ▼
+                      AWS Lambda (Node 22, ARM64, role própria)
+                        ├─ api-lavagens ──▶ Amazon DynamoDB (tabela única PK/SK)
+                        └─ ia-extração/recibo ─▶ Step Functions ─▶ Amazon Bedrock
+                                                                 └▶ S3 (uploads)
+   IaC: AWS CDK + cdk-nag        Observabilidade: CloudWatch Logs + X-Ray
+   Config/contrato: SSM          Criptografia em repouso: KMS
 ```
 
-- O backend Node encaixa bem em **Lambda** (serverless) ou Fargate.
-- Front React servido via S3 + CloudFront.
-- Desacoplamento já refletido nas camadas routes → service → repository.
-- IaC (SAM/CDK/CloudFormation) descreve os componentes de nuvem, se houver tempo.
+- O backend Node roda em **Lambda** atrás da **API Gateway HTTP API**; a lógica
+  de rotas/service (regras R01–R23) é empacotada como handler.
+- Front React servido via **S3 + CloudFront** (OAC, HTTPS).
+- Persistência em **DynamoDB** (tabela única PK/SK), sem RDS no MVP.
+- IaC em **AWS CDK** com **cdk-nag**, `us-east-1` (ver `infra-base`).
+- Diagrama completo e legenda: `docs/arquitetura-aws.mmd`.
 
-> No MVP, S3/Lambda/API Gateway são dispensáveis (Node roda local); o desenho
-> acima é o caminho para produção e serve ao pitch (C2, C6).
+> Alinhado à spec `infra-base`. Para desenvolvimento local, usar DynamoDB Local
+> com o mesmo repositório; o desenho acima é o alvo de implantação (C2, C6).
 
 ## Segurança (Requisito 11 — critério C4)
 
-| Aspecto | MVP | Produção |
+| Aspecto | MVP (local) | AWS |
 |---|---|---|
-| Autenticação | usuário fixo/mock | Amazon Cognito |
-| Autorização | perfil único (gestor) | IAM + escopos por perfil, menor privilégio |
-| Injeção | SQL parametrizado (prepared statements) | idem + validação de entrada |
+| Autenticação | usuário mock | Amazon Cognito (grupos atendente/gestor) |
+| Autorização | perfil único | JWT no API Gateway + menor privilégio IAM por Lambda |
+| Entrada maliciosa | validação de schema | idem + authorizer JWT antes da Lambda |
 | Dados sensíveis | sem PII em log/API | idem + mascaramento |
-| Criptografia | HTTP local | HTTPS (TLS); repouso com KMS/S3 SSE/RDS encryption |
+| Criptografia | HTTP local | HTTPS (TLS); repouso com KMS/S3 SSE/DynamoDB KMS |
 
-- **Validação/sanitização:** schema Zod nos payloads + regras no service;
-  **sempre** usar prepared statements/parâmetros no acesso ao banco — nunca
-  concatenar SQL — para prevenir injeção.
+- **Validação/sanitização:** schema Zod nos payloads + regras no service. O
+  acesso a DynamoDB é via SDK (DocumentClient) com parâmetros — sem construção
+  dinâmica de expressões a partir de entrada do usuário.
 - **Menor privilégio:** roles/policies IAM concedem apenas o necessário (ex.:
   `bedrock:InvokeModel` no modelo usado, acesso ao bucket específico).
 - **Exposição:** `cnpjPosto` e `idPessoaCadastrador` nunca em log ou resposta de
@@ -131,30 +149,46 @@ Navegador ──HTTPS──▶ API Gateway ──▶ Lambda (Node) / ECS Fargate
   `.kiro/steering/aws-credenciaisK.md`.
 - **Trânsito/repouso:** HTTPS fim a fim; criptografia em repouso nos dados reais.
 
-## Modelo de dados
+## Modelo de dados (DynamoDB — tabela única PK/SK)
 
-Fiel ao DDL de `docs/lavagem-sintetico.sql`.
+A estrutura e os dados fictícios de `docs/lavagem-sintetico.sql` são mapeados
+para itens de uma **tabela única DynamoDB** (padrão PK/SK da spec `infra-base`),
+preservando os atributos e as regras.
 
-### `FR_LAVAGEM` (tabela principal)
+### Desenho de chaves
 
-| Campo (API) | Coluna | Tipo | Obrigatório | Regra |
-|---|---|---|---|---|
-| `idLavagem` | `ID_LAVAGEM` | INTEGER PK | sim (gerado) | R01 — sequence `FR_LAVAGEM_SEQ` |
-| `idTipoLavagem` | `ID_TIPO_LAVAGEM` | FK | sim | R02, R05 |
-| `dataLavagem` | `DT_LAVAGEM` | DATE | sim | R02, R15 |
-| `kmLavagem` | `KM_LAVAGEM` | INTEGER | sim | R02, R04 (> 0) |
-| `valorLavagem` | `VL_LAVAGEM` | NUMERIC(5,2) | condicional | R03 (> 0 se informado), R11 |
-| `idVeiculo` | `ID_VEICULO` | FK | sim | R02, R06 |
-| `dsPosto` | `DS_POSTO` | VARCHAR(255) | condicional | R14 |
-| `cnpjPosto` | `CNPJ_POSTO` | VARCHAR(18) | condicional | R14 |
-| `idPosto` | `ID_POSTO` | FK | condicional | R07, R13 |
-| `idPessoaCadastrador` | `ID_PESSOA_CADASTRADOR` | INTEGER | auto | R08 (usuário mock) |
-| `dataCadastro` | `DT_CADASTRO` | DATE | auto | R08 (data atual) |
+| Entidade | PK | SK | Atributos principais |
+|---|---|---|---|
+| Lavagem | `VEICULO#<idVeiculo>` | `LAVAGEM#<idLavagem>` | tipo, data, km, valor, posto (id/ds/cnpj), cadastrador, dataCadastro |
+| Veículo (mock) | `VEICULO#<idVeiculo>` | `META` | descrição, `kmAtual` (R16) |
+| Tipo de lavagem | `TIPO#<idTipo>` | `META` | descrição |
+| Posto (mock) | `POSTO#<idPosto>` | `META` | nome |
+| Contador de PK | `SEQ#LAVAGEM` | `META` | próximo `idLavagem` (inicia em 3397) |
 
-Tabelas de apoio: `FR_TIPO_LAVAGEM`, `FR_VEICULO_MOCK` (inclui `KM_ATUAL`),
-`FR_POSTO_MOCK`. Como o SQLite não tem sequence nativa, a PK é gerada por
-`AUTOINCREMENT` iniciando no valor da sequence original (3397), ou por uma tabela
-de controle — preservando o comportamento de R01.
+- Listar lavagens do veículo (R19/R20): `Query` por `PK = VEICULO#<id>` e
+  `SK begins_with "LAVAGEM#"`, ordenado por data no serviço.
+- PK da lavagem (R01): obtida por incremento atômico (`UpdateItem` com
+  `ADD`) no item contador `SEQ#LAVAGEM`, preservando o comportamento da sequence
+  original (`FR_LAVAGEM_SEQ`, início 3397).
+
+### Atributos da Lavagem
+
+| Atributo (API) | Origem (`FR_LAVAGEM`) | Obrigatório | Regra |
+|---|---|---|---|
+| `idLavagem` | `ID_LAVAGEM` | sim (gerado) | R01 — contador atômico |
+| `idTipoLavagem` | `ID_TIPO_LAVAGEM` | sim | R02, R05 |
+| `dataLavagem` | `DT_LAVAGEM` | sim | R02, R15 |
+| `kmLavagem` | `KM_LAVAGEM` | sim | R02, R04 (> 0) |
+| `valorLavagem` | `VL_LAVAGEM` | condicional | R03 (> 0 se informado), R11 |
+| `idVeiculo` | `ID_VEICULO` | sim | R02, R06 |
+| `dsPosto` | `DS_POSTO` | condicional | R14 |
+| `cnpjPosto` | `CNPJ_POSTO` | condicional | R14 |
+| `idPosto` | `ID_POSTO` | condicional | R07, R13 |
+| `idPessoaCadastrador` | `ID_PESSOA_CADASTRADOR` | auto | R08 (usuário do token/mock) |
+| `dataCadastro` | `DT_CADASTRO` | auto | R08 (data atual) |
+
+As FKs do modelo relacional (R05/R06/R07) viram **verificações de existência**
+no serviço (`GetItem` do tipo/veículo/posto) antes de gravar.
 
 > Nota: `propriaUnidade` ("Na Unidade?") e `postoConveniado` ("Posto
 > Conveniado?") NÃO existem na tabela — são indicadores de entrada (do payload)
@@ -216,8 +250,9 @@ O `lavagemService.incluir(idVeiculo, payload)` aplica, em ordem:
 3. **Condicionais — posto** (R12, R13, R14), apenas se externa:
    - `postoConveniado === true` → `idPosto` obrigatório; dsPosto/cnpjPosto nulos.
    - `postoConveniado === false` → `dsPosto` e `cnpjPosto` obrigatórios; idPosto nulo.
-4. **Persistência** (R01, R08, R17): gera PK, preenche `dataCadastro` (atual) e
-   `idPessoaCadastrador` (usuário mock), executa INSERT parametrizado.
+4. **Persistência** (R01, R08, R17): gera PK (incremento atômico no contador),
+   preenche `dataCadastro` (atual) e `idPessoaCadastrador` (usuário do token/mock),
+   grava o item com `PutItem` no DynamoDB.
 5. **Retorno** (R18, R23): devolve a lista atualizada + mensagem de sucesso.
 
 Mapa de rastreabilidade regra → componente:
@@ -253,8 +288,9 @@ Mapa de rastreabilidade regra → componente:
 
 ## Privacidade desde o projeto (Requisito 8 — OT 17 / LGPD)
 
-- Apenas dados fictícios (SQLite carregado do `lavagem-sintetico.sql`).
-- Minimização: persistir só os campos de `FR_LAVAGEM`.
+- Apenas dados fictícios (itens DynamoDB carregados a partir de
+  `lavagem-sintetico.sql`).
+- Minimização: persistir só os atributos da lavagem.
 - Logs sem PII: não registrar `cnpjPosto` nem `idPessoaCadastrador` em claro.
 - Cadastrador vem do contexto (mock), nunca do corpo da requisição.
 
@@ -287,13 +323,13 @@ Testes de `lavagemService` cobrindo cada ramo do gabarito (seção 5 de
 ```
 backend/
   src/
-    db/          schema.sql (DDL), seed (dados fictícios), conexão SQLite
+    db/          client DynamoDB (DocumentClient), seed (dados fictícios)
     repositories/ lavagemRepo, tipoLavagemRepo, veiculoRepo, postoRepo
     services/    lavagemService.js   (regras R01–R18)
     schemas/     lavagemSchema.js    (Zod — estruturais R02/R03/R04/R15)
     routes/      lavagens.routes.js, veiculos.routes.js
-    app.js       (Express)
-    server.js
+    handler.js   (adaptador Lambda/API Gateway)
+    app.js       (Express — dev local)
   test/          lavagemService.test, lavagens.api.test
   package.json
 frontend/

@@ -1,0 +1,70 @@
+%% Arquitetura AWS - SigFrota (modulo Lavagem)
+%% Fonte: .kiro/specs/infra-base/requirements.md
+%% Serverless, us-east-1, provisionado por AWS CDK + cdk-nag
+graph TB
+    user["Atendente / Gestor<br/>(navegador)"]
+
+    subgraph edge["Borda / Entrega"]
+        cf["Amazon CloudFront<br/>HTTPS, OAC, headers de seguranca<br/>SPA fallback index.html"]
+        s3web["Amazon S3 (privado)<br/>build do front + config.json<br/>Block Public Access, SSE-S3"]
+    end
+
+    subgraph auth["Autenticacao"]
+        cognito["Amazon Cognito User Pool<br/>grupos: atendente, gestor<br/>Auth Code + PKCE, MFA TOTP opcional<br/>dominio sigfrota-&lt;sufixo&gt;"]
+    end
+
+    subgraph api["API"]
+        apigw["API Gateway HTTP API (v2)<br/>Authorizer JWT (padrao)<br/>CORS restrito, throttling, access logs"]
+    end
+
+    subgraph compute["Computacao (Lambda Node 22 ARM64, role propria)"]
+        lmbLav["Lambda api-lavagens<br/>regras R01-R23<br/>(spec 3)"]
+        lmbRegra["Lambda ia-extracao-regras<br/>(spec 5)"]
+        lmbRecibo["Lambda ia-leitura-recibo<br/>(spec 6)"]
+    end
+
+    subgraph ia["IA / Orquestracao"]
+        sfn["AWS Step Functions<br/>fluxo de extracao/leitura"]
+        bedrock["Amazon Bedrock<br/>extracao de regras + geracao<br/>bedrock:InvokeModel"]
+        s3up["Amazon S3<br/>bucket de upload (recibos/SQL)"]
+    end
+
+    subgraph dados["Dados"]
+        ddb["Amazon DynamoDB<br/>tabela unica PK/SK<br/>PAY_PER_REQUEST, KMS, PITR"]
+    end
+
+    subgraph obs["Observabilidade e Config"]
+        cw["Amazon CloudWatch Logs<br/>retencao 30d, X-Ray"]
+        ssm["AWS SSM Parameter Store<br/>/sigfrota/... (contrato de infra)"]
+        kms["AWS KMS<br/>criptografia em repouso"]
+    end
+
+    iac["AWS CDK (TypeScript) + cdk-nag<br/>IaC, us-east-1, tags de custo"]
+
+    user -->|HTTPS| cf
+    cf -->|OAC| s3web
+    user -->|login OIDC| cognito
+    user -->|REST + JWT| apigw
+    apigw -->|valida token| cognito
+    apigw --> lmbLav
+    apigw --> lmbRegra
+    apigw --> lmbRecibo
+    lmbLav -->|Query/GetItem| ddb
+    lmbRegra --> sfn
+    lmbRecibo --> sfn
+    sfn --> bedrock
+    sfn --> s3up
+    lmbRegra -.-> bedrock
+    lmbRecibo -.-> bedrock
+    ddb --- kms
+    s3web --- kms
+    lmbLav --> cw
+    lmbRegra --> cw
+    lmbRecibo --> cw
+    apigw --> cw
+    iac -.provisiona.-> edge
+    iac -.provisiona.-> auth
+    iac -.provisiona.-> api
+    iac -.provisiona.-> compute
+    iac -.provisiona.-> dados
+    iac -.publica outputs.-> ssm
