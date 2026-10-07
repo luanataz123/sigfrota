@@ -176,42 +176,48 @@ export function LavagemForm({
           veículo atual e é incluído no payload por `montarPayloadLavagem` no
           envio (tarefa 7.5). Exposto também em data-id-veiculo para rastreio. */}
 
-      {/* Tipo de lavagem — obrigatório (R02); envia idTipoLavagem (Req. 4.5/R05). */}
-      <Select
-        label="Tipo de lavagem"
-        placeholder="Selecione o tipo"
-        options={opcoesTipo}
-        required
-        error={errors.idTipoLavagem?.message}
-        {...register('idTipoLavagem', { valueAsNumber: true })}
-      />
+      {/* Campos base sempre visíveis. Layout responsivo (Req. 10.5): coluna
+          única em telas estreitas, duas colunas a partir de `md` (tablet/desktop).
+          Os campos condicionais abaixo ficam em largura total para não causar
+          saltos de layout quando aparecem/desaparecem. */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {/* Tipo de lavagem — obrigatório (R02); envia idTipoLavagem (Req. 4.5/R05). */}
+        <Select
+          label="Tipo de lavagem"
+          placeholder="Selecione o tipo"
+          options={opcoesTipo}
+          required
+          error={errors.idTipoLavagem?.message}
+          {...register('idTipoLavagem', { valueAsNumber: true })}
+        />
 
-      {/* Data da lavagem — obrigatória (R02); ISO YYYY-MM-DD (R15/Req. 7.2). */}
-      <DateInput
-        label="Data da lavagem"
-        required
-        error={errors.dtLavagem?.message}
-        {...register('dtLavagem')}
-      />
+        {/* Data da lavagem — obrigatória (R02); ISO YYYY-MM-DD (R15/Req. 7.2). */}
+        <DateInput
+          label="Data da lavagem"
+          required
+          error={errors.dtLavagem?.message}
+          {...register('dtLavagem')}
+        />
 
-      {/* Odômetro (Km) — obrigatório e > 0 (R02/R04). */}
-      <Field
-        label="Odômetro (Km)"
-        type="number"
-        inputMode="numeric"
-        min={1}
-        required
-        error={errors.kmLavagem?.message}
-        {...register('kmLavagem', { valueAsNumber: true })}
-      />
+        {/* Odômetro (Km) — obrigatório e > 0 (R02/R04). */}
+        <Field
+          label="Odômetro (Km)"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          required
+          error={errors.kmLavagem?.message}
+          {...register('kmLavagem', { valueAsNumber: true })}
+        />
 
-      {/* "Na própria unidade?" — toggle S/N, default S (R09). */}
-      <Select
-        label="Na própria unidade?"
-        options={OPCOES_SIM_NAO}
-        error={errors.propriaUnidade?.message}
-        {...register('propriaUnidade')}
-      />
+        {/* "Na própria unidade?" — toggle S/N, default S (R09). */}
+        <Select
+          label="Na própria unidade?"
+          options={OPCOES_SIM_NAO}
+          error={errors.propriaUnidade?.message}
+          {...register('propriaUnidade')}
+        />
+      </div>
 
       {/* "Posto conveniado?" — toggle S/N, default S (R12). Só faz sentido na
           externa; a visibilidade fina é refinada na tarefa 7.3. */}
