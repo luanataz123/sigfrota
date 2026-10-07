@@ -1,0 +1,54 @@
+{
+  "caso": "E03",
+  "arquivo": "E03-valor-acima-limite.png",
+  "objetivo": "Valor de R$ 1.250,00 excede NUMBER(5,2): extrair o valor real e marcar erro de limite. \"completa\" na descrição não deve virar tipo 2.",
+  "requisitos": [
+    "RQ-REC-05.2",
+    "RQ-REC-05.4",
+    "R03",
+    "R11"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": true,
+    "dataLavagem": "2026-09-14",
+    "valorTotal": 1250,
+    "nomeEstabelecimento": "ESTETICA AUTOMOTIVA PRIME",
+    "cnpjEstabelecimento": "06.122.944/0001-18",
+    "idTipoLavagem": 3,
+    "kmVeiculo": null,
+    "placa": "ABC1D23"
+  },
+  "resultadoEsperado": {
+    "status": "CONCLUIDO",
+    "sugestao": {
+      "propriaUnidade": false,
+      "postoConveniado": false,
+      "idPosto": null,
+      "dsPosto": "ESTETICA AUTOMOTIVA PRIME",
+      "cnpjPosto": "06.122.944/0001-18",
+      "vlLavagem": 1250,
+      "dtLavagem": "2026-09-14",
+      "idTipoLavagem": 3,
+      "kmLavagem": null
+    },
+    "alertas": [
+      "VALOR_FORA_REFERENCIA"
+    ],
+    "erros": [
+      {
+        "campo": "vlLavagem",
+        "regra": "LIMITE_VALOR"
+      },
+      {
+        "campo": "kmLavagem",
+        "regra": "R02"
+      }
+    ]
+  }
+}

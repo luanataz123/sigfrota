@@ -145,7 +145,7 @@ Os specs 1, 2 e 5 não dependem de nenhum outro e podem começar em paralelo.
 | 3 | `api-lavagens` | CRUD e `GET /veiculos/{id}/lavagens`, contador atômico, checagem de existência, cadastrador do token, Km Atual, carga dos dados sintéticos | R01, R05–R08, R16–R20 | 1, 2 |
 | 4 | `frontend-lavagens` | Login Cognito, painel de lavagens do veículo, formulário com campos condicionais, confirmação na exclusão | R09–R14, R17–R23 | contrato do 3 (pode usar mock) |
 | 5 | `ia-extracao-regras` | Upload do SQL no S3 → Step Functions → Bedrock → regras em JSON com trecho de origem → comparação com o gabarito e tela de precisão | todas (gabarito) | — |
-| 6 | `ia-leitura-recibo` | Foto do recibo → Bedrock multimodal → preenchimento do formulário; imagem apagada por lifecycle no S3 | — | 4 |
+| 6 | `ia-leitura-recibo` | Upload do recibo no S3 → EventBridge → Step Functions → Bedrock multimodal → sugestão no DynamoDB → front consulta e preenche o formulário para revisão; imagem apagada ao fim da execução (lifecycle como rede de segurança). Detalhes em `requirements-recibo-ia.md` | — | 4 |
 
 Opcional, se sobrar tempo: `ia-anomalias` (ideia 3).
 

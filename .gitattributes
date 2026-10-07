@@ -1,0 +1,12 @@
+# Quebra de linha LF para todo arquivo de texto, em qualquer sistema (Windows, WSL, Linux, macOS).
+# Sobrepõe o core.autocrlf de cada máquina. Evita arquivos "modificados" só por CRLF e
+# mantém o teste de determinismo do seed (data/seed/seed.test.mjs) passando.
+* text=auto eol=lf
+
+# Binários: nunca converter
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.pdf  binary
+*.docx binary

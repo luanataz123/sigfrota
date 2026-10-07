@@ -1,0 +1,21 @@
+{
+  "caso": "E05",
+  "arquivo": "E05-ilegivel.png",
+  "objetivo": "Foto muito desfocada e sem contraste: status ILEGIVEL, formulário em branco, nenhum valor \"chutado\".",
+  "requisitos": [
+    "RQ-REC-03.3"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": false
+  },
+  "resultadoEsperado": {
+    "status": "ILEGIVEL",
+    "sugestao": null
+  }
+}

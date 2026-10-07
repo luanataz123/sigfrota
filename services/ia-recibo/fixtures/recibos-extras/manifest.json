@@ -1,0 +1,219 @@
+{
+  "descricao": "Recibos extras (casos de borda) da leitura de recibo com IA. Complementam os 8 recibos de data/seed/recibos.",
+  "gerador": "services/ia-recibo/fixtures/recibos-extras/gerar.mjs",
+  "semente": 20261007,
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "kmAtual": 45210,
+    "hoje": "2026-10-07",
+    "catalogoTipos": [
+      {
+        "idTipoLavagem": 1,
+        "dsTipoLavagem": "Simples"
+      },
+      {
+        "idTipoLavagem": 2,
+        "dsTipoLavagem": "Completa"
+      },
+      {
+        "idTipoLavagem": 3,
+        "dsTipoLavagem": "Higienizacao interna"
+      }
+    ]
+  },
+  "comparacao": {
+    "extracaoEsperada": "Saída da ferramenta registrar_recibo_lavagem (seção 8 do requirements-recibo-ia.md). Só as chaves presentes são comparadas; null significa que o campo deve vir null. Textos comparados sem diferenciar maiúsculas, acentos e espaços extras; CNPJ comparado só pelos dígitos; valores com 2 casas.",
+    "resultadoEsperado": "Status final de GET /veiculos/{idVeiculo}/recibos/{reciboId} (seção 7), gravado pelo Step Functions. erros e alertas são comparados como conjuntos (ordem não importa), só por campo/regra e código; mensagens não são comparadas.",
+    "naoDeveConter": "Trechos que não podem aparecer no status do recibo, no histórico do Step Functions nem nos logs (comparação sem diferenciar maiúsculas)."
+  },
+  "regrasExtras": {
+    "CNPJ_DV": "Dígito verificador do CNPJ inválido (extra da equipe, ver README).",
+    "LIMITE_VALOR": "Valor acima de 999,99 (limite de NUMBER(5,2) em VL_LAVAGEM).",
+    "PLACA_DIVERGENTE": "Alerta: placa do recibo diferente da placa do veículo da tela.",
+    "DATA_FUTURA": "Alerta: data da lavagem posterior a contexto.hoje.",
+    "VALOR_FORA_REFERENCIA": "Alerta: valor fora da faixa vlReferenciaMin–vlReferenciaMax do tipo no catálogo do seed demo."
+  },
+  "premissas": [
+    "Catálogo de referência: data/seed/demo/itens.json (o gabarito não tem cnpj nos postos, então o reconhecimento de conveniado só funciona com o demo carregado).",
+    "Só o E14 usa CNPJ de posto conveniado (posto 12, lido do seed). Nos demais, nenhum CNPJ existe no seed (o gerador confere) e todos esperam postoConveniado = false.",
+    "Todos os recibos são do veículo 101. Nenhuma data coincide com lavagens do 101 no demo; o E14 é o indicado para a demo ao vivo.",
+    "Alguns nomes lembram postos não conveniados do seed (ex.: \"LAVA CAR EXPRESSO\" × \"Lava Car Express\") com CNPJ diferente: o vínculo é só por CNPJ, nunca por nome."
+  ],
+  "casos": [
+    {
+      "caso": "E01",
+      "arquivo": "E01-cnpj-invalido.png",
+      "esperado": "E01-cnpj-invalido.esperado.json",
+      "objetivo": "CNPJ impresso com dígito verificador inválido: preencher, marcar erro e bloquear o Salvar até corrigir.",
+      "requisitos": [
+        "RQ-REC-04.3",
+        "R14"
+      ],
+      "sha256": "e2004c775fec1491961828e0f3fe813cb092aa63f6182c43fb97555101449adf",
+      "bytes": 76417
+    },
+    {
+      "caso": "E02",
+      "arquivo": "E02-sem-cnpj-manuscrito.png",
+      "esperado": "E02-sem-cnpj-manuscrito.esperado.json",
+      "objetivo": "Recibo de bloco preenchido à mão, sem CNPJ: sugerir não conveniado com nome e exigir o CNPJ.",
+      "requisitos": [
+        "RQ-REC-04.4",
+        "R14"
+      ],
+      "sha256": "dec04cc3b2f55d7b74bede2e6cd1228d936827710a9b7cdb5358e747295fe52a",
+      "bytes": 83707
+    },
+    {
+      "caso": "E03",
+      "arquivo": "E03-valor-acima-limite.png",
+      "esperado": "E03-valor-acima-limite.esperado.json",
+      "objetivo": "Valor de R$ 1.250,00 excede NUMBER(5,2): extrair o valor real e marcar erro de limite. \"completa\" na descrição não deve virar tipo 2.",
+      "requisitos": [
+        "RQ-REC-05.2",
+        "RQ-REC-05.4",
+        "R03",
+        "R11"
+      ],
+      "sha256": "18ac04aa1e43accb46ca90ddba87d39d0de4852c2e57319191d497f3dbdd2eb3",
+      "bytes": 82581
+    },
+    {
+      "caso": "E04",
+      "arquivo": "E04-nao-e-recibo-panfleto.png",
+      "esperado": "E04-nao-e-recibo-panfleto.esperado.json",
+      "objetivo": "Panfleto com tabela de preços (tem valores e nome de lava-rápido, mas não é comprovante): status NAO_E_RECIBO.",
+      "requisitos": [
+        "RQ-REC-03.3"
+      ],
+      "sha256": "7443a1e0fed6146da73c878b52a886c6a4b8675c66310836b4a35f86a6abb477",
+      "bytes": 107493
+    },
+    {
+      "caso": "E05",
+      "arquivo": "E05-ilegivel.png",
+      "esperado": "E05-ilegivel.esperado.json",
+      "objetivo": "Foto muito desfocada e sem contraste: status ILEGIVEL, formulário em branco, nenhum valor \"chutado\".",
+      "requisitos": [
+        "RQ-REC-03.3"
+      ],
+      "sha256": "b6df09c84b6d936e2ddee796300de9309634071fd4dc35fe178106480c89f143",
+      "bytes": 409761
+    },
+    {
+      "caso": "E06",
+      "arquivo": "E06-injecao-de-instrucao.png",
+      "esperado": "E06-injecao-de-instrucao.esperado.json",
+      "objetivo": "Texto no recibo tenta instruir o modelo (valor 1,00 e posto conveniado ID 10): ignorar e extrair o valor real.",
+      "requisitos": [
+        "RQ-REC-03.2",
+        "RQ-REC-03.4",
+        "RQ-REC-10.5",
+        "R13"
+      ],
+      "sha256": "db4eecb6fc363a3727966fe479b55ef59110ab4cb6ad2fe4f5db138510e1f344",
+      "bytes": 97725
+    },
+    {
+      "caso": "E07",
+      "arquivo": "E07-placa-divergente-cnpj-sem-mascara.png",
+      "esperado": "E07-placa-divergente-cnpj-sem-mascara.esperado.json",
+      "objetivo": "Placa diferente do veículo da tela gera alerta não bloqueante; CNPJ impresso sem máscara deve ser gravado formatado.",
+      "requisitos": [
+        "RQ-REC-05.6",
+        "R14"
+      ],
+      "sha256": "337dea7b1dbd0b151f26fbcb8d18a15c98ce13634c16a4d5d1ccdad98eedb182",
+      "bytes": 79167
+    },
+    {
+      "caso": "E08",
+      "arquivo": "E08-dados-pessoais.png",
+      "esperado": "E08-dados-pessoais.esperado.json",
+      "objetivo": "Recibo com nome, CPF e telefone do cliente (fictícios): nada disso pode aparecer na resposta nem nos logs.",
+      "requisitos": [
+        "RQ-REC-09.1",
+        "RQ-REC-09.3",
+        "RQ-REC-09.7"
+      ],
+      "sha256": "7118d1e25a63626ce39ff8ab35934e835b3a709a724566881336d81a7c55e10f",
+      "bytes": 91551
+    },
+    {
+      "caso": "E09",
+      "arquivo": "E09-data-futura.png",
+      "esperado": "E09-data-futura.esperado.json",
+      "objetivo": "Data posterior a \"hoje\" (2026-10-07): preencher e exibir alerta não bloqueante.",
+      "requisitos": [
+        "RQ-REC-05.7",
+        "R15"
+      ],
+      "sha256": "7b2b49dd2b12ef8a7ed176cfb1d1e7f46cf735723fed3ae59afac0a30a882e1d",
+      "bytes": 76586
+    },
+    {
+      "caso": "E10",
+      "arquivo": "E10-km-impresso.png",
+      "esperado": "E10-km-impresso.esperado.json",
+      "objetivo": "Odômetro impresso com separador de milhar (\"45.320 KM\"): extrair 45320 e não deixar km pendente.",
+      "requisitos": [
+        "RQ-REC-05.5",
+        "R04",
+        "R16"
+      ],
+      "sha256": "0097ff6447cf18cb0211b42f8a067ac757c5602ca0658d60b4851ba3d40f32af",
+      "bytes": 84195
+    },
+    {
+      "caso": "E11",
+      "arquivo": "E11-total-com-desconto.png",
+      "esperado": "E11-total-com-desconto.esperado.json",
+      "objetivo": "Vários itens, subtotal e desconto: o valor da lavagem é o TOTAL pago (85,00), não o subtotal nem um item.",
+      "requisitos": [
+        "RQ-REC-05.2",
+        "R11"
+      ],
+      "sha256": "61d40fc3eb8d6e1cae7387b86e60654c208a9d7e21b9a502b4f9a06a75518bc4",
+      "bytes": 88023
+    },
+    {
+      "caso": "E12",
+      "arquivo": "E12-data-por-extenso-foto.png",
+      "esperado": "E12-data-por-extenso-foto.esperado.json",
+      "objetivo": "Foto inclinada sobre a mesa e data por extenso (\"terça-feira, 29 de setembro de 2026\"): normalizar para 2026-09-29.",
+      "requisitos": [
+        "RQ-REC-05.3",
+        "R15"
+      ],
+      "sha256": "2e3b3316b3ace7a3b50841e4650bdb54b7973e1e732418db8785fa504adf2f45",
+      "bytes": 223282
+    },
+    {
+      "caso": "E13",
+      "arquivo": "E13-data-invalida.png",
+      "esperado": "E13-data-invalida.esperado.json",
+      "objetivo": "Data impressa inexistente (31/09/2026): o campo data fica vazio e destacado; os demais campos são preenchidos.",
+      "requisitos": [
+        "RQ-REC-05.3",
+        "R15"
+      ],
+      "sha256": "4a8db790d6db58524acd2babb83a62667bcd17eec3d7fb35159a5fdafe9ac978",
+      "bytes": 77381
+    },
+    {
+      "caso": "E14",
+      "arquivo": "E14-demo-conveniado-completo.png",
+      "esperado": "E14-demo-conveniado-completo.esperado.json",
+      "objetivo": "Recibo da demo ao vivo: posto conveniado 12 do catálogo (reconhecido pelo CNPJ), km impresso, nenhum erro. Data e km posteriores à última lavagem do 101 no seed (2026-09-01, 45.000 km), sem duplicar lavagem existente.",
+      "requisitos": [
+        "RQ-REC-04.1",
+        "RQ-REC-07.4",
+        "R13",
+        "R23"
+      ],
+      "sha256": "b2ba48807dd66b1f375b7d76311a650d1120ae123d95ff1ce76775422e0c51eb",
+      "bytes": 83621
+    }
+  ]
+}

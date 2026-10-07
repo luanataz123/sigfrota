@@ -1,5 +1,7 @@
 .kiro/steering/aws-profile.md
 
+# Metadados do Windows ("Mark of the Web") gravados em arquivos baixados
+*Zone.Identifier
 # Dependências e artefatos de build
 node_modules
 dist
