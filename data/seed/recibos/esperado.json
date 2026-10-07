@@ -1,0 +1,66 @@
+[
+  {
+    "arquivo": "recibo-3437.png",
+    "idLavagem": 3437,
+    "vlLavagem": 45.78,
+    "dtLavagem": "2025-12-06",
+    "nomePosto": "Lava Car Express",
+    "cnpj": "35.204.199/0001-54"
+  },
+  {
+    "arquivo": "recibo-3442.png",
+    "idLavagem": 3442,
+    "vlLavagem": 55.84,
+    "dtLavagem": "2025-12-13",
+    "nomePosto": "Lava-Rapido Rodoviaria",
+    "cnpj": "14.480.131/0001-28"
+  },
+  {
+    "arquivo": "recibo-3446.png",
+    "idLavagem": 3446,
+    "vlLavagem": 72.64,
+    "dtLavagem": "2025-12-25",
+    "nomePosto": "Estetica Automotiva Ipe",
+    "cnpj": "55.456.066/0001-82"
+  },
+  {
+    "arquivo": "recibo-3456.png",
+    "idLavagem": 3456,
+    "vlLavagem": 33.71,
+    "dtLavagem": "2026-01-09",
+    "nomePosto": "Lava-Jato Boa Vista",
+    "cnpj": "71.746.193/0001-72"
+  },
+  {
+    "arquivo": "recibo-3460.png",
+    "idLavagem": 3460,
+    "vlLavagem": 85.15,
+    "dtLavagem": "2026-01-12",
+    "nomePosto": "Lava Car Esplanada",
+    "cnpj": "14.100.456/0001-38"
+  },
+  {
+    "arquivo": "recibo-3481.png",
+    "idLavagem": 3481,
+    "vlLavagem": 137.7,
+    "dtLavagem": "2026-02-15",
+    "nomePosto": "Lava-Rapido Centro-Oeste",
+    "cnpj": "91.980.229/0001-95"
+  },
+  {
+    "arquivo": "recibo-3574.png",
+    "idLavagem": 3574,
+    "vlLavagem": 72.4,
+    "dtLavagem": "2026-06-12",
+    "nomePosto": "Posto Rodovia Leste",
+    "cnpj": "44.437.775/0001-02"
+  },
+  {
+    "arquivo": "recibo-3583.png",
+    "idLavagem": 3583,
+    "vlLavagem": 197.5,
+    "dtLavagem": "2026-06-26",
+    "nomePosto": "Auto Posto Planalto",
+    "cnpj": "55.104.977/0001-40"
+  }
+]
