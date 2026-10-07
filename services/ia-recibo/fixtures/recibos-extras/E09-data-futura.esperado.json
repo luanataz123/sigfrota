@@ -1,0 +1,48 @@
+{
+  "caso": "E09",
+  "arquivo": "E09-data-futura.png",
+  "objetivo": "Data posterior a \"hoje\" (2026-10-07): preencher e exibir alerta não bloqueante.",
+  "requisitos": [
+    "RQ-REC-05.7",
+    "R15"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": true,
+    "dataLavagem": "2026-12-15",
+    "valorTotal": 60,
+    "nomeEstabelecimento": "LAVA RAPIDO PLANALTO",
+    "cnpjEstabelecimento": "54.436.880/0001-72",
+    "idTipoLavagem": 2,
+    "kmVeiculo": null,
+    "placa": "ABC1D23"
+  },
+  "resultadoEsperado": {
+    "status": "CONCLUIDO",
+    "sugestao": {
+      "propriaUnidade": false,
+      "postoConveniado": false,
+      "idPosto": null,
+      "dsPosto": "LAVA RAPIDO PLANALTO",
+      "cnpjPosto": "54.436.880/0001-72",
+      "vlLavagem": 60,
+      "dtLavagem": "2026-12-15",
+      "idTipoLavagem": 2,
+      "kmLavagem": null
+    },
+    "alertas": [
+      "DATA_FUTURA"
+    ],
+    "erros": [
+      {
+        "campo": "kmLavagem",
+        "regra": "R02"
+      }
+    ]
+  }
+}

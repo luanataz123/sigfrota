@@ -1,0 +1,46 @@
+{
+  "caso": "E12",
+  "arquivo": "E12-data-por-extenso-foto.png",
+  "objetivo": "Foto inclinada sobre a mesa e data por extenso (\"terça-feira, 29 de setembro de 2026\"): normalizar para 2026-09-29.",
+  "requisitos": [
+    "RQ-REC-05.3",
+    "R15"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": true,
+    "dataLavagem": "2026-09-29",
+    "valorTotal": 40,
+    "nomeEstabelecimento": "LAVA-JATO BEIRA LAGO",
+    "cnpjEstabelecimento": "94.818.312/0001-50",
+    "idTipoLavagem": 1,
+    "kmVeiculo": null,
+    "placa": "ABC1D23"
+  },
+  "resultadoEsperado": {
+    "status": "CONCLUIDO",
+    "sugestao": {
+      "propriaUnidade": false,
+      "postoConveniado": false,
+      "idPosto": null,
+      "dsPosto": "LAVA-JATO BEIRA LAGO",
+      "cnpjPosto": "94.818.312/0001-50",
+      "vlLavagem": 40,
+      "dtLavagem": "2026-09-29",
+      "idTipoLavagem": 1,
+      "kmLavagem": null
+    },
+    "alertas": [],
+    "erros": [
+      {
+        "campo": "kmLavagem",
+        "regra": "R02"
+      }
+    ]
+  }
+}

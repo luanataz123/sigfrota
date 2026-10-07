@@ -1,0 +1,20 @@
+{
+  "caso": "E04",
+  "arquivo": "E04-nao-e-recibo-panfleto.png",
+  "objetivo": "Panfleto com tabela de preços (tem valores e nome de lava-rápido, mas não é comprovante): status NAO_E_RECIBO.",
+  "requisitos": [
+    "RQ-REC-03.3"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": false
+  },
+  "resultadoEsperado": {
+    "status": "NAO_E_RECIBO",
+    "sugestao": null
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "caso": "E11",
+  "arquivo": "E11-total-com-desconto.png",
+  "objetivo": "Vários itens, subtotal e desconto: o valor da lavagem é o TOTAL pago (85,00), não o subtotal nem um item.",
+  "requisitos": [
+    "RQ-REC-05.2",
+    "R11"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": true,
+    "dataLavagem": "2026-09-26",
+    "valorTotal": 85,
+    "nomeEstabelecimento": "SUPER LAVAGEM ASA SUL",
+    "cnpjEstabelecimento": "80.571.425/0001-90",
+    "idTipoLavagem": 2,
+    "kmVeiculo": null,
+    "placa": "ABC1D23"
+  },
+  "resultadoEsperado": {
+    "status": "CONCLUIDO",
+    "sugestao": {
+      "propriaUnidade": false,
+      "postoConveniado": false,
+      "idPosto": null,
+      "dsPosto": "SUPER LAVAGEM ASA SUL",
+      "cnpjPosto": "80.571.425/0001-90",
+      "vlLavagem": 85,
+      "dtLavagem": "2026-09-26",
+      "idTipoLavagem": 2,
+      "kmLavagem": null
+    },
+    "alertas": [],
+    "erros": [
+      {
+        "campo": "kmLavagem",
+        "regra": "R02"
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "caso": "E10",
+  "arquivo": "E10-km-impresso.png",
+  "objetivo": "Odômetro impresso com separador de milhar (\"45.320 KM\"): extrair 45320 e não deixar km pendente.",
+  "requisitos": [
+    "RQ-REC-05.5",
+    "R04",
+    "R16"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": true,
+    "dataLavagem": "2026-09-25",
+    "valorTotal": 30,
+    "nomeEstabelecimento": "POSTO E LAVAGEM VIA NORTE",
+    "cnpjEstabelecimento": "25.308.648/0001-50",
+    "idTipoLavagem": 1,
+    "kmVeiculo": 45320,
+    "placa": "ABC1D23"
+  },
+  "resultadoEsperado": {
+    "status": "CONCLUIDO",
+    "sugestao": {
+      "propriaUnidade": false,
+      "postoConveniado": false,
+      "idPosto": null,
+      "dsPosto": "POSTO E LAVAGEM VIA NORTE",
+      "cnpjPosto": "25.308.648/0001-50",
+      "vlLavagem": 30,
+      "dtLavagem": "2026-09-25",
+      "idTipoLavagem": 1,
+      "kmLavagem": 45320
+    },
+    "alertas": [],
+    "erros": []
+  }
+}

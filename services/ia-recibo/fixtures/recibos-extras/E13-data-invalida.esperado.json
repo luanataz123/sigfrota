@@ -1,0 +1,49 @@
+{
+  "caso": "E13",
+  "arquivo": "E13-data-invalida.png",
+  "objetivo": "Data impressa inexistente (31/09/2026): o campo data fica vazio e destacado; os demais campos são preenchidos.",
+  "requisitos": [
+    "RQ-REC-05.3",
+    "R15"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": true,
+    "valorTotal": 75,
+    "nomeEstabelecimento": "LAVAGEM PONTO CERTO",
+    "cnpjEstabelecimento": "29.320.793/0001-08",
+    "idTipoLavagem": 2,
+    "kmVeiculo": null,
+    "placa": "ABC1D23"
+  },
+  "resultadoEsperado": {
+    "status": "CONCLUIDO",
+    "sugestao": {
+      "propriaUnidade": false,
+      "postoConveniado": false,
+      "idPosto": null,
+      "dsPosto": "LAVAGEM PONTO CERTO",
+      "cnpjPosto": "29.320.793/0001-08",
+      "vlLavagem": 75,
+      "dtLavagem": null,
+      "idTipoLavagem": 2,
+      "kmLavagem": null
+    },
+    "alertas": [],
+    "erros": [
+      {
+        "campo": "dtLavagem",
+        "regra": "R15"
+      },
+      {
+        "campo": "kmLavagem",
+        "regra": "R02"
+      }
+    ]
+  }
+}
