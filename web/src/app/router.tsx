@@ -22,23 +22,31 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { LoginPage } from '../auth/LoginPage';
 import { RequireAuth } from '../auth/RequireAuth';
+import { FrotaPage } from '../features/veiculo/FrotaPage';
 import { VeiculoPage } from '../features/veiculo/VeiculoPage';
 import { LavagemFormPage } from '../features/lavagem/LavagemFormPage';
 
-/** Veículo usado na demo ao acessar a raiz "/" (Req. 11.3). */
+/** Veículo de referência da demo (gabarito); a raiz leva à lista da frota. */
 export const ID_VEICULO_DEMO = 101;
 
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Raiz → veículo demo; RequireAuth dessa rota desvia ao login se preciso. */}
-      <Route
-        path="/"
-        element={<Navigate to={`/veiculos/${ID_VEICULO_DEMO}`} replace />}
-      />
+      {/* Raiz → frota; RequireAuth da rota de destino desvia ao login se preciso. */}
+      <Route path="/" element={<Navigate to="/veiculos" replace />} />
 
       {/* Público (Req. 1.1). */}
       <Route path="/login" element={<LoginPage />} />
+
+      {/* Protegido: seleção do veículo na frota. */}
+      <Route
+        path="/veiculos"
+        element={
+          <RequireAuth>
+            <FrotaPage />
+          </RequireAuth>
+        }
+      />
 
       {/* Protegido: tela do veículo (R16, R19–R23). */}
       <Route

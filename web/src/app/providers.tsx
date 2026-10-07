@@ -15,7 +15,7 @@
 // que só existem DENTRO de Auth/Router. Por isso o client é criado em um
 // componente interno (`ConexaoLavagemClient`) que vive abaixo desses providers.
 
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useRef, type ReactNode } from 'react';
 import { BrowserRouter, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, type AuthAdapter, type Sessao } from '../auth/AuthProvider';
@@ -51,6 +51,14 @@ function ConexaoLavagemClient({ children }: { children: ReactNode }) {
   const { obterToken, logout } = useAuth();
   const navigate = useNavigate();
 
+  // `navigate` (BrowserRouter) muda de identidade a cada troca de rota. Se ele
+  // entrasse nas dependências do `useMemo`, o client seria recriado a cada
+  // navegação e o MockLavagemClient (estado em memória) perderia as lavagens
+  // incluídas (R23). Por isso guardamos o `navigate` mais recente em uma ref e
+  // mantemos o client estável.
+  const navigateRef = useRef(navigate);
+  navigateRef.current = navigate;
+
   // Recria o client apenas quando as dependências estáveis mudam. `obterToken`
   // é estável (useCallback no AuthProvider) e lê sempre o token mais recente.
   const client = useMemo(
@@ -58,10 +66,10 @@ function ConexaoLavagemClient({ children }: { children: ReactNode }) {
       criarLavagemClient({
         obterToken, // Req. 1.3
         aoNaoAutorizado: criarHandler401(logout, () =>
-          navigate('/login', { replace: true }),
+          navigateRef.current('/login', { replace: true }),
         ), // Req. 1.4
       }),
-    [obterToken, logout, navigate],
+    [obterToken, logout],
   );
 
   return <LavagemClientProvider client={client}>{children}</LavagemClientProvider>;

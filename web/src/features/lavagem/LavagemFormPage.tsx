@@ -44,6 +44,9 @@ import type { ValoresFormularioLavagem } from '../../lib/validationResolver';
 import type { VeiculoPageState } from '../veiculo/VeiculoPage';
 import { Spinner } from '../../components/Spinner';
 import { ErrorState } from '../../components/ErrorState';
+import { BarraSuperior, Migalhas } from '../../components/AppShell';
+import { PlacaVeiculo } from '../../components/PlacaVeiculo';
+import { useVeiculo } from '../veiculo/useLavagens';
 import { LavagemForm } from './LavagemForm';
 import { ConfirmDeleteDialog } from './ConfirmDeleteDialog';
 import { useLavagemMutations } from './useLavagemMutations';
@@ -103,7 +106,7 @@ export function LavagemFormPage() {
   }
 
   return (
-    <LayoutFormulario titulo={titulo}>
+    <LayoutFormulario titulo={titulo} idVeiculo={idVeiculo}>
       {modo === 'edicao' ? (
         <FormularioEdicao
           idVeiculo={idVeiculo}
@@ -132,18 +135,48 @@ export function LavagemFormPage() {
 /** Casca visual comum (cabeçalho com o título do modo) — Req. 3.4. */
 function LayoutFormulario({
   titulo,
+  idVeiculo,
   children,
 }: {
   titulo: string;
+  /** Quando informado, exibe a identificação do veículo e o breadcrumb. */
+  idVeiculo?: number;
   children: React.ReactNode;
 }) {
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 p-6">
-      <header className="border-b border-slate-200 pb-4">
-        <h1 className="text-2xl font-semibold text-slate-800">{titulo}</h1>
-      </header>
-      {children}
-    </main>
+    <div className="min-h-screen">
+      <BarraSuperior />
+      <main className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-8">
+        {idVeiculo !== undefined && (
+          <Migalhas
+            itens={[
+              { rotulo: 'Frota', to: '/veiculos' },
+              { rotulo: `Veículo ${idVeiculo}`, to: `/veiculos/${idVeiculo}` },
+              { rotulo: titulo },
+            ]}
+          />
+        )}
+        <header className="flex flex-col gap-3">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{titulo}</h1>
+          {idVeiculo !== undefined && <IdentificacaoVeiculo idVeiculo={idVeiculo} />}
+        </header>
+        <div className="card flex flex-col gap-6 p-6">{children}</div>
+      </main>
+    </div>
+  );
+}
+
+/** Faixa compacta com a placa e o nome do veículo da lavagem (contexto). */
+function IdentificacaoVeiculo({ idVeiculo }: { idVeiculo: number }) {
+  const { data: veiculo } = useVeiculo(idVeiculo);
+  if (!veiculo) return null;
+  const nome = [veiculo.marca, veiculo.modelo].filter(Boolean).join(' ') || veiculo.descricao;
+  return (
+    <p className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
+      <PlacaVeiculo placa={veiculo.placa} tamanho="pequeno" />
+      <span className="font-semibold text-slate-800">{nome}</span>
+      {veiculo.ano && <span>· {veiculo.ano}</span>}
+    </p>
   );
 }
 
@@ -283,7 +316,7 @@ function FormularioEdicao({
       <button
         type="button"
         onClick={() => setConfirmandoExclusao(true)}
-        className="inline-flex items-center gap-2 self-start rounded border border-red-300 bg-white px-4 py-2 font-medium text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400"
+        className="btn-danger self-start"
       >
         Excluir
       </button>

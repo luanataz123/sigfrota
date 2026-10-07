@@ -1,4 +1,4 @@
-// features/lavagem/gabarito.test.tsx
+﻿// features/lavagem/gabarito.test.tsx
 //
 // SUÍTE CONSOLIDADA DE RASTREABILIDADE — espelha 1:1 a tabela §5 do gabarito de
 // regras de negócio (docs/lavagem-gabarito-regras.md, "Casos de teste
@@ -50,6 +50,10 @@ import { LavagemClientProvider } from '../../app/LavagemClientProvider';
 import { LavagemForm } from './LavagemForm';
 import { PainelLavagens } from '../veiculo/PainelLavagens';
 import { useLavagemMutations } from './useLavagemMutations';
+import { LAVAGENS_INICIAIS } from '../../mocks/dados-sinteticos';
+
+/** Lavagens do veículo 101 no conjunto `demo` (inclui a 3397 do gabarito). */
+const LAVAGENS_101 = LAVAGENS_INICIAIS.filter((l) => l.idVeiculo === 101).length;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Infra de teste reutilizando os padrões das suítes existentes:
@@ -432,19 +436,19 @@ describe('Gabarito §5 — listagem por veículo (componente PainelLavagens)', (
 
     const tabela = await screen.findByRole('table');
     const linhas = within(tabela).getAllByRole('row');
-    // 1 cabeçalho + exatamente as 2 lavagens do veículo 101 (R19: filtro por id).
-    expect(linhas).toHaveLength(3);
+    // 1 cabeçalho + exatamente as lavagens do veículo 101 (R19: filtro por id).
+    expect(linhas).toHaveLength(1 + LAVAGENS_101);
 
-    // Datas das duas lavagens do 101; a de 102/103 NÃO aparece (R19).
-    const dataAnterior = screen.getByText('20/08/2026');
-    const dataPosterior = screen.getByText('01/09/2026');
+    // Primeira e última lavagens do 101; as de 102/103 NÃO aparecem (R19).
+    const dataAnterior = within(tabela).getByText('02/10/2025');
+    const dataPosterior = within(tabela).getByText('01/09/2026');
     expect(dataAnterior).toBeInTheDocument();
     expect(dataPosterior).toBeInTheDocument();
     // Lavagens de outros veículos (ex.: 03/09/2026 do 102) não vazam para o 101.
     expect(screen.queryByText('03/09/2026')).not.toBeInTheDocument();
     expect(screen.queryByText('05/09/2026')).not.toBeInTheDocument();
 
-    // Ordenado por data ASC (R20): 20/08 antes de 01/09 na ordem do DOM.
+    // Ordenado por data ASC (R20): 02/10/2025 antes de 01/09/2026 no DOM.
     expect(
       dataAnterior.compareDocumentPosition(dataPosterior) &
         Node.DOCUMENT_POSITION_FOLLOWING,
@@ -493,7 +497,7 @@ describe('Gabarito §5 — resultado na tela (integração painel + mutação)',
     render(<PainelLavagens idVeiculo={101} />, { wrapper: Wrapper });
 
     const tabela = await screen.findByRole('table');
-    expect(within(tabela).getAllByRole('row')).toHaveLength(3); // cabeçalho + 2
+    expect(within(tabela).getAllByRole('row')).toHaveLength(1 + LAVAGENS_101); // cabeçalho + existentes
 
     // Hook de mutação ligado ao MESMO QueryClient/cliente (via o mesmo wrapper).
     const { result } = renderHook(() => useLavagemMutations(101), {
@@ -509,11 +513,13 @@ describe('Gabarito §5 — resultado na tela (integração painel + mutação)',
     });
 
     // Após a invalidação de ['lavagens', 101], o painel re-renderiza com a nova
-    // lavagem já visível: cabeçalho + 3 lavagens, incluindo a data recém-criada.
+    // lavagem já visível: cabeçalho + existentes + 1, incluindo a data recém-criada.
     await waitFor(() => {
       const atual = screen.getByRole('table');
-      expect(within(atual).getAllByRole('row')).toHaveLength(4);
+      expect(within(atual).getAllByRole('row')).toHaveLength(2 + LAVAGENS_101);
     });
-    expect(screen.getByText('10/10/2026')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('table')).getByText('10/10/2026'),
+    ).toBeInTheDocument();
   });
 });

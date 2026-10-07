@@ -3,6 +3,7 @@ import type { Lavagem, Veiculo, TipoLavagem, Posto } from './types';
 
 export interface LavagemClient {
   listarLavagens(idVeiculo: number): Promise<Lavagem[]>;      // R19/R20
+  listarVeiculos(): Promise<Veiculo[]>;                       // seleção do veículo (frota)
   obterVeiculo(idVeiculo: number): Promise<Veiculo>;          // R16 (KM_ATUAL)
   obterLavagem(id: number): Promise<Lavagem>;                 // R21 (edição)
   listarTipos(): Promise<TipoLavagem[]>;                      // Req.4.5

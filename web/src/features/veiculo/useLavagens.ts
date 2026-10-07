@@ -44,6 +44,18 @@ export function lavagensQueryKey(idVeiculo: number) {
   return ['lavagens', idVeiculo] as const;
 }
 
+/** Query key da frota (lista de veículos). */
+export const veiculosQueryKey = ['veiculos'] as const;
+
+/** Lista os veículos da frota para a tela de seleção. */
+export function useVeiculos(): UseQueryResult<Veiculo[], Error> {
+  const client = useLavagemClient();
+  return useQuery({
+    queryKey: veiculosQueryKey,
+    queryFn: () => client.listarVeiculos(),
+  });
+}
+
 /** Query key do veículo (Km Atual read-only). */
 export function veiculoQueryKey(idVeiculo: number) {
   return ['veiculo', idVeiculo] as const;

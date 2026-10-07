@@ -5,6 +5,11 @@ export interface Veiculo {
   idVeiculo: number;
   descricao: string;
   kmAtual: number;        // R16 (referência, read-only)
+  // Identificação do veículo (cadastro de veículos; somente leitura na tela).
+  placa?: string;
+  marca?: string;
+  modelo?: string;
+  ano?: number;
 }
 
 export interface TipoLavagem {

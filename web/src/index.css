@@ -1,3 +1,57 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Tema do SIG Frota: azul institucional + neutros frios. Contraste AA nos textos. */
+@layer base {
+  html {
+    @apply antialiased;
+  }
+  body {
+    @apply min-h-screen bg-slate-100 text-slate-800;
+    background-image:
+      radial-gradient(60rem 30rem at 100% -10%, rgb(37 99 235 / 0.10), transparent 60%),
+      radial-gradient(50rem 25rem at -10% 110%, rgb(14 165 233 / 0.10), transparent 60%);
+    background-attachment: fixed;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  }
+}
+
+@layer components {
+  /* Cartão padrão */
+  .card {
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-sm shadow-slate-900/5;
+  }
+
+  /* Botões */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
+      disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply btn bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-md shadow-blue-700/25
+      hover:from-blue-500 hover:to-blue-700 active:translate-y-px;
+  }
+  .btn-secondary {
+    @apply btn border border-slate-300 bg-white text-slate-700 shadow-sm hover:bg-slate-50;
+  }
+  .btn-danger {
+    @apply btn border border-red-200 bg-white text-red-700 hover:bg-red-50;
+  }
+
+  /* Campos de formulário */
+  .input {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 shadow-sm transition
+      placeholder:text-slate-400 hover:border-slate-400
+      focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30
+      disabled:bg-slate-100 aria-[invalid=true]:border-red-400 aria-[invalid=true]:focus:ring-red-400/30;
+  }
+
+  /* Selos (badges) */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset;
+  }
+}

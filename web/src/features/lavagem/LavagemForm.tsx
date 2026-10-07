@@ -287,7 +287,7 @@ export function LavagemForm({
         type="submit"
         disabled={enviando}
         aria-busy={enviando}
-        className="inline-flex items-center gap-2 self-start rounded bg-slate-800 px-4 py-2 font-medium text-white hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-slate-800"
+        className="btn-primary self-start px-6"
       >
         {enviando && (
           <Spinner

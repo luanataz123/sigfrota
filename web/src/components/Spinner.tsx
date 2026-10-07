@@ -40,7 +40,7 @@ export function Spinner({
     >
       <span
         aria-hidden="true"
-        className={`inline-block animate-spin rounded-full border-slate-300 border-t-slate-600 ${TAMANHOS[tamanho]}`}
+        className={`inline-block animate-spin rounded-full border-slate-300 border-t-blue-600 ${TAMANHOS[tamanho]}`}
       />
       <span className="sr-only">{label}</span>
     </div>

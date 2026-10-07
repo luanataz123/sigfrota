@@ -19,7 +19,7 @@ import { useAuth } from './useAuth';
 import { CredenciaisInvalidasError } from './MockAuthAdapter';
 
 /** Rota padrão pós-login quando não há destino pretendido (Req. 1.1). */
-export const ROTA_PADRAO_POS_LOGIN = '/veiculos/101';
+export const ROTA_PADRAO_POS_LOGIN = '/veiculos';
 
 interface LocationState {
   from?: Location;
@@ -73,9 +73,36 @@ export function LoginPage({ rotaPadrao = ROTA_PADRAO_POS_LOGIN }: LoginPageProps
   const temErro = erro !== null;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center gap-6 p-6">
+    <div className="grid min-h-screen lg:grid-cols-2">
+      {/* Painel de marca (decorativo; some em telas estreitas). */}
+      <aside
+        aria-hidden="true"
+        className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-blue-600 p-12 text-white lg:flex"
+      >
+        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-sky-400/20 blur-3xl" />
+        <p className="relative text-sm font-semibold uppercase tracking-widest text-blue-100">
+          Ministério Público Federal
+        </p>
+        <div className="relative">
+          <p className="text-5xl font-extrabold leading-tight tracking-tight">
+            SIG Frota
+            <span className="block text-blue-200">Módulo de Lavagem</span>
+          </p>
+          <p className="mt-4 max-w-md text-lg text-blue-100/90">
+            Registre e acompanhe as lavagens da frota com regras validadas e
+            histórico por veículo.
+          </p>
+        </div>
+        <p className="relative text-xs text-blue-100/70">
+          Hackathon AWS × MPF · dados fictícios
+        </p>
+      </aside>
+
+      <main className="flex items-center justify-center p-6">
+        <div className="card flex w-full max-w-sm flex-col gap-6 p-8">
       <header>
-        <h1 className="text-2xl font-semibold text-slate-800">Entrar</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Entrar</h1>
         <p className="mt-1 text-sm text-slate-600">
           Acesse o módulo de lavagem do SIG Frota.
         </p>
@@ -86,7 +113,7 @@ export function LoginPage({ rotaPadrao = ROTA_PADRAO_POS_LOGIN }: LoginPageProps
           <div
             id="erro-login"
             role="alert"
-            className="rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700"
+            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
           >
             {erro}
           </div>
@@ -107,7 +134,7 @@ export function LoginPage({ rotaPadrao = ROTA_PADRAO_POS_LOGIN }: LoginPageProps
             aria-invalid={temErro}
             aria-describedby={temErro ? 'erro-login' : undefined}
             disabled={autenticando}
-            className="rounded border border-slate-300 px-3 py-2 text-slate-900 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-100"
+            className="input"
           />
         </div>
 
@@ -126,18 +153,20 @@ export function LoginPage({ rotaPadrao = ROTA_PADRAO_POS_LOGIN }: LoginPageProps
             aria-invalid={temErro}
             aria-describedby={temErro ? 'erro-login' : undefined}
             disabled={autenticando}
-            className="rounded border border-slate-300 px-3 py-2 text-slate-900 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-100"
+            className="input"
           />
         </div>
 
         <button
           type="submit"
           disabled={autenticando}
-          className="mt-2 rounded bg-slate-800 px-4 py-2 font-medium text-white hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn-primary mt-2 py-2.5"
         >
           {autenticando ? 'Entrando…' : 'Entrar'}
         </button>
       </form>
-    </main>
+        </div>
+      </main>
+    </div>
   );
 }

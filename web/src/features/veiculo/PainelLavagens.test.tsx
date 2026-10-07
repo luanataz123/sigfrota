@@ -69,14 +69,14 @@ function criarClientSemLavagens(idVeiculo: number): LavagemClient {
 }
 
 describe('PainelLavagens — listagem (R19/R20 — Req. 2.1–2.3)', () => {
-  it('lista as duas lavagens do veículo 101 com Tipo / Data / Km / Valor', async () => {
+  it('lista as lavagens do veículo 101 com Tipo / Data / Local / Km / Valor', async () => {
     renderPainel(new MockLavagemClient({ latenciaMs: 0 }));
 
     // A tabela aparece quando a lista carrega.
     const tabela = await screen.findByRole('table');
     const linhas = within(tabela).getAllByRole('row');
-    // 1 linha de cabeçalho + 2 lavagens do 101.
-    expect(linhas).toHaveLength(3);
+    // 1 linha de cabeçalho + 11 lavagens do 101 (conjunto demo).
+    expect(linhas).toHaveLength(12);
 
     // Cabeçalhos de coluna acessíveis (th scope="col").
     expect(
@@ -92,16 +92,26 @@ describe('PainelLavagens — listagem (R19/R20 — Req. 2.1–2.3)', () => {
       within(tabela).getByRole('columnheader', { name: 'Valor' }),
     ).toBeInTheDocument();
 
-    // Ordenado por data: 2026-08-20 (interna, Simples) antes de 2026-09-01
-    // (externa, Completa, R$ 60,00).
-    expect(screen.getByText('20/08/2026')).toBeInTheDocument();
-    expect(screen.getByText('01/09/2026')).toBeInTheDocument();
-    // Descrição do tipo resolvida pelo mapa de tipos (R20).
-    expect(screen.getByText('Simples')).toBeInTheDocument();
-    expect(screen.getByText('Completa')).toBeInTheDocument();
+    expect(
+      within(tabela).getByRole('columnheader', { name: 'Local' }),
+    ).toBeInTheDocument();
+
+    // Ordenado por data: 02/10/2025 (3400) antes de 01/09/2026 (3397, R$ 60,00).
+    const primeira = within(tabela).getByText('02/10/2025');
+    const ultima = within(tabela).getByText('01/09/2026');
+    expect(
+      primeira.compareDocumentPosition(ultima) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // Descrição do tipo resolvida pelo mapa de tipos (R20); há várias linhas.
+    expect(screen.getAllByText('Simples').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Completa').length).toBeGreaterThan(0);
+    expect(screen.getByText('Higienização interna')).toBeInTheDocument();
+    // Local: própria unidade e posto conveniado (R09/R12).
+    expect(screen.getAllByText('Própria unidade').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Posto conveniado').length).toBeGreaterThan(0);
     // Km formatado com separador de milhar.
     expect(screen.getByText('45.000')).toBeInTheDocument();
-    expect(screen.getByText('44.120')).toBeInTheDocument();
+    expect(screen.getByText('22.790')).toBeInTheDocument();
     // Valor da lavagem externa em BRL.
     expect(screen.getByText(/R\$\s?60,00/)).toBeInTheDocument();
   });
@@ -110,9 +120,9 @@ describe('PainelLavagens — listagem (R19/R20 — Req. 2.1–2.3)', () => {
     renderPainel(new MockLavagemClient({ latenciaMs: 0 }));
 
     const tabela = await screen.findByRole('table');
-    // A lavagem interna é a 3400 (2026-08-20). Localiza a linha pela data e
+    // A lavagem interna de 31/01/2026 (3471). Localiza a linha pela data e
     // confere que a célula de valor exibe o placeholder "—".
-    const celulaData = within(tabela).getByText('20/08/2026');
+    const celulaData = within(tabela).getByText('31/01/2026');
     const linhaInterna = celulaData.closest('tr')!;
     expect(within(linhaInterna).getByText('—')).toBeInTheDocument();
     // A lavagem externa NÃO mostra "—" no valor (mostra R$).
@@ -145,7 +155,7 @@ describe('PainelLavagens — listagem (R19/R20 — Req. 2.1–2.3)', () => {
 
     const tabela = await screen.findByRole('table');
     const links = within(tabela).getAllByRole('link', { name: /Editar/i });
-    expect(links).toHaveLength(2);
+    expect(links).toHaveLength(11);
     // Os links apontam para as rotas de edição das lavagens do 101 (3397/3400).
     const hrefs = links.map((l) => l.getAttribute('href'));
     expect(hrefs).toContain('/veiculos/101/lavagens/3397');
