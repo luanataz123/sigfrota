@@ -1,1 +1,0 @@
-Testado e aprovado

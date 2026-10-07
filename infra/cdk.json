@@ -1,0 +1,11 @@
+{
+  "app": "npx tsx bin/sigfrota.ts",
+  "watch": {
+    "include": ["bin/**", "lib/**"],
+    "exclude": ["cdk.out", "node_modules", "test"]
+  },
+  "context": {
+    "throttleTaxa": 50,
+    "throttleRajada": 100
+  }
+}

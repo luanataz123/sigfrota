@@ -2,3 +2,10 @@
 
 # Metadados do Windows ("Mark of the Web") gravados em arquivos baixados
 *Zone.Identifier
+# Infraestrutura (CDK)
+infra/cdk.out/
+infra/node_modules/
+
+# Configuração local do front (gerada por scripts/gerar-env-web.mjs)
+web/.env.local
+node_modules
