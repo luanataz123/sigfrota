@@ -3,7 +3,8 @@
 ## Introdução
 
 Este documento especifica a migração assistida por IA de uma fatia do módulo de
-Lavagem do SIG Frota, hoje em Oracle APEX / PL/SQL, para Java/Spring. O recorte é
+Lavagem do SIG Frota, hoje em Oracle APEX / PL/SQL, para **Node.js + React +
+Tailwind** (tecnologia disponível no ambiente). O recorte é
 a **tela de Veículo enxuta** (identificação do veículo + painel de lavagens) e o
 **cadastro de lavagem**, preservando fielmente as regras de negócio que hoje
 vivem no código legado e incorporando os padrões institucionais de
@@ -251,7 +252,8 @@ avaliação C2
 
 1. A SOLUÇÃO DEVE utilizar o **Amazon Bedrock** para a extração das regras de
    negócio a partir do SQL/PL/SQL e para a geração de código/spec, evidenciando
-   esse uso na documentação e na demonstração. (C2)
+   esse uso na documentação e na demonstração. O acesso ao Bedrock DEVE usar o
+   profile `sigfrota` conforme `.kiro/steering/aws-credenciaisK.md`. (C2)
 2. O DESIGN DEVE descrever o caminho de produção com serviços gerenciados AWS
    (ex.: API Gateway, Lambda, S3) e o desacoplamento em camadas, ainda que o MVP
    rode localmente. (C2)
@@ -276,12 +278,16 @@ proteger a solução e os dados.
    no caminho de produção; usuário mock no MVP, com a estratégia real documentada).
    (C4)
 2. AS roles e policies IAM DEVEM seguir o princípio do menor privilégio. (C4)
-3. O SISTEMA DEVE validar e sanitizar as entradas, usando acesso parametrizado ao
-   banco (JPA) para prevenir injeção. (C4)
+3. O SISTEMA DEVE validar e sanitizar as entradas, usando consultas parametrizadas
+   (prepared statements) no acesso ao banco para prevenir injeção. (C4)
 4. O SISTEMA NÃO DEVE expor dados sensíveis em logs nem nas respostas da API
    (reforça o Requisito 8). (C4)
 5. O DESIGN DEVE prever HTTPS e criptografia em trânsito e em repouso (ex.:
    KMS/S3 SSE) no caminho de produção. (C4)
+6. O ACESSO à AWS (ex.: Bedrock) DEVE usar o profile nomeado `sigfrota` e seguir
+   `.kiro/steering/aws-credenciaisK.md`: segredos nunca em código, log ou commit;
+   `~/.aws/*` e arquivos `.env` fora do repositório; policies com menor privilégio
+   (ex.: `bedrock:InvokeModel` restrito ao modelo usado). (C4)
 
 ---
 

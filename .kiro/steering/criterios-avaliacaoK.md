@@ -22,11 +22,11 @@ Quanto o MVP atende aos requisitos funcionais e não-funcionais do caso de uso.
 
 Orientações:
 - Cobrir as funcionalidades do caso de uso (F1–F5) e os requisitos da spec
-  (`requirementsK.md`): extração de regras, módulo Java/Spring, tela de inclusão.
+  (`requirementsK.md`): extração de regras, módulo Node.js + React, tela de inclusão.
 - Entregar o **fluxo principal de ponta a ponta**: abrir veículo → incluir
   lavagem → ver a lista re-renderizada com a nova lavagem e mensagem de sucesso.
 - Tratar entradas/saídas conforme especificado (entrada é SQL/APEX; saída é
-  módulo Java + endpoints REST + tela).
+  API Node + endpoints REST + tela React).
 - Usar os **dados sintéticos** do kit (`lavagem-sintetico.sql`) na demo.
 - Garantir qualidade e utilidade do output (API e tela realmente funcionais).
 
@@ -42,7 +42,7 @@ Orientações:
 - Mostrar desacoplamento e separação de responsabilidades (camadas:
   controller → service → repository, conforme `designK.md`).
 - Se houver tempo, infraestrutura como código (SAM/CDK/CloudFormation).
-- Nota: o Java gerado roda localmente no MVP; S3/Lambda/API Gateway são
+- Nota: o código Node/React roda localmente no MVP; S3/Lambda/API Gateway são
   dispensáveis, mas citá-los no caminho de produção agrega pontos.
 
 ## 3. Inovação e Criatividade
@@ -50,7 +50,7 @@ Orientações:
 Originalidade e uso inteligente das tecnologias.
 
 Orientações:
-- Destacar o diferencial: **migração APEX→Java assistida por IA com
+- Destacar o diferencial: **migração APEX→Node.js/React assistida por IA com
   rastreabilidade** (regra → origem no PL/SQL) como critério anti-distorção.
 - Usar explicitamente **specs, hooks e steering do Kiro** como parte da solução —
   isto é pontuado. (A spec `lavagem-veiculo` e este steering já contam.)
@@ -67,7 +67,8 @@ Orientações:
   mock, mas descrever a estratégia real.
 - Princípio do menor privilégio em roles e policies IAM.
 - **Validar e sanitizar inputs** (as validações de regra R02–R15 também protegem
-  contra dados inválidos); usar queries parametrizadas (JPA) contra injeção.
+  contra dados inválidos); usar consultas parametrizadas (prepared statements)
+  contra injeção.
 - Tratamento seguro de dados: não expor dados sensíveis em logs nem na API
   (sem CNPJ do posto nem identificador do cadastrador em claro).
 - HTTPS, criptografia em trânsito e repouso (KMS/S3 SSE) no desenho de produção.
@@ -81,8 +82,8 @@ Qualidade do pitch de 5 minutos.
 Orientações:
 - Estruturar: **problema → solução → demo → resultados → próximos passos**.
 - Demo ao vivo funcional: incluir uma lavagem e mostrar o resultado na tela.
-- Explicar com clareza a arquitetura e as decisões técnicas (por que Java/Spring,
-  por que Bedrock, como garantimos rastreabilidade).
+- Explicar com clareza a arquitetura e as decisões técnicas (por que Node.js +
+  React + Tailwind, por que Bedrock, como garantimos rastreabilidade).
 - Gerir o tempo: caber nos 5 minutos; respostas objetivas no 1 min de Q&A.
 - Preparar antecipadamente dados e ambiente para a demo não falhar.
 
