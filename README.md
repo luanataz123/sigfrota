@@ -92,11 +92,61 @@ Ordenadas por retorno nos critérios e risco na demo:
 
 Uso do Kiro como parte da solução (critério 3): spec gerado a partir do gabarito, hook que roda os testes ao salvar e steering exigindo que cada validação cite a Rxx.
 
+## Specs (Kiro)
+
+Os specs 1, 2 e 5 não dependem de nenhum outro e podem começar em paralelo.
+
+| # | Spec | Escopo | Regras | Depende de |
+|---|------|--------|--------|------------|
+| 1 | `infra-base` | DynamoDB com criptografia, Cognito (`atendente`, `gestor`), API Gateway com authorizer JWT, S3 + CloudFront, IAM de menor privilégio por Lambda | — | — |
+| 2 | `dominio-lavagem` | Módulo Node.js sem dependência da AWS com as validações; testes a partir dos casos do gabarito, cada um citando a Rxx | R02–R04, R09–R15 | — |
+| 3 | `api-lavagens` | CRUD e `GET /veiculos/{id}/lavagens`, contador atômico, checagem de existência, cadastrador do token, Km Atual, carga dos dados sintéticos | R01, R05–R08, R16–R20 | 1, 2 |
+| 4 | `frontend-lavagens` | Login Cognito, painel de lavagens do veículo, formulário com campos condicionais, confirmação na exclusão | R09–R14, R17–R23 | contrato do 3 (pode usar mock) |
+| 5 | `ia-extracao-regras` | Upload do SQL no S3 → Step Functions → Bedrock → regras em JSON com trecho de origem → comparação com o gabarito e tela de precisão | todas (gabarito) | — |
+| 6 | `ia-leitura-recibo` | Foto do recibo → Bedrock multimodal → preenchimento do formulário; imagem apagada por lifecycle no S3 | — | 4 |
+
+Opcional, se sobrar tempo: `ia-anomalias` (ideia 3).
+
+Rastreabilidade das Rxx e execução de testes ficam fora dos specs, como um steering file e um hook válidos para todos.
+
+## Divisão da equipe
+
+| Pessoa | Spec principal | Depois / em paralelo |
+|--------|----------------|----------------------|
+| 1 | `infra-base` | Deploy contínuo e segurança/LGPD para o pitch |
+| 2 | `dominio-lavagem` | Revisar a cobertura das Rxx nos outros specs |
+| 3 | `api-lavagens` | Carga dos dados sintéticos e roteiro da demo |
+| 4 | `frontend-lavagens` | Polimento de UX |
+| 5 | `ia-extracao-regras` | Tela de precisão contra o gabarito |
+| 6 | `ia-leitura-recibo` | Pitch, estimativa de custo e próximos passos |
+
+A pessoa 6 começa pela parte do recibo que não depende do front (Lambda e prompt no Bedrock) e integra ao formulário quando o spec 4 estiver pronto.
+
+## Estrutura do repositório
+
+Monorepo com npm workspaces, uma pasta por spec:
+
+```
+infra/                 # spec 1 — IaC (CDK ou SAM)
+packages/dominio/      # spec 2 — regras compartilhadas por API e front
+services/api/          # spec 3
+services/ia-regras/    # spec 5
+services/ia-recibo/    # spec 6
+web/                   # spec 4 — React + Tailwind
+docs/                  # insumos do hackathon
+```
+
+## Combinados da equipe
+
+1. **Cada pessoa mexe quase só na sua pasta**, para reduzir conflitos na `main`.
+2. **Contratos na primeira hora:** as pessoas 1 e 3 fecham o OpenAPI e o desenho das chaves no DynamoDB; front e IA trabalham contra mocks até a API ficar pronta.
+3. **`packages/dominio` é a fonte única das regras:** o mesmo módulo de validação (R09–R14) roda na Lambda e no React.
+
 ## Decisões em aberto
 
 1. **Features de IA:** quais das ideias acima entram no MVP (recomendação: 1 e 2; a 3 se sobrar tempo).
-2. **IaC:** SAM ou CDK.
-3. **Escopo:** depende do tempo restante e do tamanho da equipe.
+2. **IaC:** SAM ou CDK (recomendação: CDK em TypeScript, mesma linguagem do projeto).
+3. **Escopo:** ajustar ao tempo restante do hackathon.
 
 ## Como colaborar
 
