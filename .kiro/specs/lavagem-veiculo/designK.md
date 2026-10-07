@@ -54,6 +54,69 @@ Camadas (arquitetura em camadas clássica do Spring):
 | Km atual | Mock via `FR_VEICULO_MOCK.KM_ATUAL` | R16 — módulo de Atendimento fora de escopo. |
 | Autenticação | Usuário fixo/mock | Cognito não exigido no MVP (caso de uso, seção 9). |
 
+## Arquitetura AWS (Requisito 10 — critério C2)
+
+O MVP roda localmente (Java/Spring + H2), mas a solução se insere num desenho AWS
+com serviços gerenciados. O serviço essencial é o **Amazon Bedrock**.
+
+### Papel do Bedrock (extração + geração)
+
+```
+docs/lavagem-sintetico.sql ─┐
+docs/*apex-trecho*.md       ─┼─▶  Amazon Bedrock (LLM)  ─▶  regras em linguagem
+docs/*gabarito*.md          ─┘    (prompt com os SQL)       natural + rastreab.
+                                                            (R01–R23 → origem)
+                                          │
+                                          ▼
+                              spec (requirements/design/tasks)
+                                          │
+                                          ▼
+                              código Java/Spring + testes
+```
+
+- Entrada: os arquivos SQL/PL/SQL do módulo (DDL + páginas APEX).
+- Bedrock extrai as regras em linguagem natural **com rastreabilidade** (cada
+  regra aponta a origem no PL/SQL) e apoia a geração da spec e do código.
+- Critério anti-distorção: o output do Bedrock é conferido contra o gabarito.
+
+### Caminho de produção (serviços gerenciados)
+
+```
+Navegador ──HTTPS──▶ API Gateway ──▶ Lambda (ou ECS/Fargate p/ Spring)
+                                        │
+                                        ├─▶ Amazon Bedrock (extração/geração)
+                                        ├─▶ RDS/Aurora (FR_LAVAGEM real)
+                                        └─▶ S3 (artefatos SQL de entrada)
+   Cognito (autenticação) ─────────────┘
+   IaC: SAM / CDK / CloudFormation      Observabilidade: CloudWatch
+```
+
+- Serverless e orientado a eventos onde fizer sentido; serviços gerenciados em
+  vez de soluções manuais.
+- Desacoplamento já refletido nas camadas controller → service → repository.
+- IaC (SAM/CDK/CloudFormation) descreve os componentes de nuvem, se houver tempo.
+
+> No MVP, S3/Lambda/API Gateway são dispensáveis (o Java roda local); o desenho
+> acima é o caminho para produção e serve ao pitch (C2, C6).
+
+## Segurança (Requisito 11 — critério C4)
+
+| Aspecto | MVP | Produção |
+|---|---|---|
+| Autenticação | usuário fixo/mock | Amazon Cognito |
+| Autorização | perfil único (gestor) | IAM + escopos por perfil, menor privilégio |
+| Injeção | acesso via JPA parametrizado | idem + validação de entrada |
+| Dados sensíveis | sem PII em log/API | idem + mascaramento |
+| Criptografia | HTTP local | HTTPS (TLS); repouso com KMS/S3 SSE/RDS encryption |
+
+- **Validação/sanitização:** Bean Validation nos DTOs + regras no Service;
+  nenhuma concatenação de SQL (Spring Data JPA parametrizado) — previne injeção.
+- **Menor privilégio:** roles/policies IAM concedem apenas o necessário (ex.:
+  `bedrock:InvokeModel` no modelo usado, acesso ao bucket específico).
+- **Exposição:** `cnpjPosto` e `idPessoaCadastrador` nunca em log ou resposta de
+  erro em claro (reforça a seção de Privacidade).
+- **Trânsito/repouso:** HTTPS fim a fim; criptografia em repouso nos dados reais.
+
 ## Modelo de dados
 
 Fiel ao DDL de `docs/lavagem-sintetico.sql`.
@@ -210,3 +273,23 @@ src/main/resources/
   └─ data.sql       (dados fictícios dos 3 cenários)
 src/test/java/...   LavagemServiceTest, LavagemControllerTest
 ```
+
+## Caminho MVP → produção (Requisito 12 — critério C6)
+
+O que falta para produção, além do MVP:
+
+- **Km atual real:** substituir o mock pela consulta ao módulo de Atendimento
+  (`FR_ATENDIMENTO`), removendo `FR_VEICULO_MOCK.KM_ATUAL`.
+- **Autenticação real:** Amazon Cognito no lugar do usuário mock.
+- **Dados reais:** trocar as tabelas-mock por FKs reais (`FR_VEICULO`,
+  `FR_POSTO`) e migrar de H2 para RDS/Aurora.
+- **Demais painéis:** abastecimento, manutenção, infração (hoje fora de escopo).
+
+Escalabilidade e custo:
+
+- Arquitetura serverless/managed escala sem re-arquitetura; custo dominado por
+  invocações do Bedrock e banco gerenciado — estimável por volume de lavagens.
+- **Reuso:** o processo de migração assistida (SQL → regras rastreáveis → Java
+  testado) aplica-se a outros módulos do SIG Frota e a outros órgãos.
+- **Manutenibilidade:** specs versionadas, testes cobrindo R01–R23 e código
+  modular por camadas sustentam a evolução.

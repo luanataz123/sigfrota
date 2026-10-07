@@ -2,7 +2,8 @@
 
 Referências: `requirementsK.md` (requisitos), `designK.md` (design),
 `docs/lavagem-gabarito-regras.md` (regras R01–R23),
-`docs/lavagem-sintetico.sql` (DDL + dados).
+`docs/lavagem-sintetico.sql` (DDL + dados),
+`.kiro/steering/criterios-avaliacaoK.md` (critérios de avaliação C1–C6).
 
 Cada tarefa cita os requisitos atendidos. As tarefas são incrementais e devem
 ser executadas em ordem; cada uma termina com código compilando e testes verdes.
@@ -75,7 +76,30 @@ ser executadas em ordem; cada uma termina com código compilando e testes verdes
     sempre do contexto mock; persistir só o necessário.
   - _Requisitos: 8._
 
-- [ ] 11. Verificação final e relatório de aderência (desejável)
+- [ ] 11. Aplicar práticas de segurança (critério C4)
+  - [ ] 11.1 Confirmar acesso ao banco só via JPA parametrizado (sem concatenação
+        de SQL); validar/sanitizar entradas nos DTOs e no Service.
+  - [ ] 11.2 Garantir que logs e respostas de erro não exponham `cnpjPosto` nem
+        `idPessoaCadastrador` em claro.
+  - [ ] 11.3 Documentar a estratégia de autenticação/autorização (Cognito/IAM em
+        produção; usuário mock no MVP) e o menor privilégio das policies IAM.
+  - _Requisitos: 11, 8._
+
+- [ ] 12. Integrar o Amazon Bedrock e desenhar a arquitetura AWS (critério C2)
+  - [ ] 12.1 Usar o Bedrock para extrair as regras do SQL/PL/SQL com
+        rastreabilidade (regra → origem) e apoiar a geração de código/spec;
+        evidenciar o uso.
+  - [ ] 12.2 Documentar o caminho de produção com serviços gerenciados
+        (API Gateway, Lambda/Fargate, Cognito, RDS/Aurora, S3) e, se houver tempo,
+        IaC (SAM/CDK/CloudFormation).
+  - _Requisitos: 10._
+
+- [ ] 13. Documentar viabilidade e caminho para produção (critério C6)
+  - Registrar o que falta para produção (Km atual real, Cognito, FKs reais,
+    demais painéis), estimativa de custo/escala e potencial de reuso.
+  - _Requisitos: 12._
+
+- [ ] 14. Verificação final e relatório de aderência (desejável)
   - Rodar build + todos os testes; conferir mapa regra→teste (R01–R23).
   - Gerar relatório de aderência (regras do gabarito cobertas pelos testes).
   - _Requisitos: 9 (F5)._

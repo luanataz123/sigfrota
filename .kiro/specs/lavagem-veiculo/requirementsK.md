@@ -223,7 +223,8 @@ dados pessoais minimamente e sem exposição indevida, para atender a LGPD.
 **User story:** Como avaliador do hackathon, quero que cada regra implementada
 cite sua origem no PL/SQL, para medir a precisão da extração e evitar distorções.
 
-**Rastreabilidade:** F1, F5; critério anti-distorção (caso de uso, seção 9)
+**Rastreabilidade:** F1, F5; critério anti-distorção (caso de uso, seção 9);
+critério de avaliação C1 e C3 (`.kiro/steering/criterios-avaliacaoK.md`)
 
 #### Critérios de aceitação
 
@@ -231,3 +232,73 @@ cite sua origem no PL/SQL, para medir a precisão da extração e evitar distor�
    negócio implementada ao seu identificador de origem (R01–R23).
 2. OS testes gerados DEVEM cobrir os cenários do gabarito (feliz e de erro) de
    modo que a aderência às regras seja verificável.
+3. A SOLUÇÃO DEVE evidenciar o uso dos recursos do Kiro (spec
+   requirements→design→tasks, steering e, quando houver, hooks) como parte
+   entregável, por ser item pontuado em Inovação. (C3)
+
+---
+
+### Requisito 10 — Arquitetura AWS e uso do Bedrock
+
+**User story:** Como arquiteto da solução, quero que a extração de regras e a
+geração de código usem o Amazon Bedrock e que o desenho preveja serviços
+gerenciados, para atender ao critério de Arquitetura AWS.
+
+**Rastreabilidade:** caso de uso, seção 9 (Bedrock essencial); critério de
+avaliação C2
+
+#### Critérios de aceitação
+
+1. A SOLUÇÃO DEVE utilizar o **Amazon Bedrock** para a extração das regras de
+   negócio a partir do SQL/PL/SQL e para a geração de código/spec, evidenciando
+   esse uso na documentação e na demonstração. (C2)
+2. O DESIGN DEVE descrever o caminho de produção com serviços gerenciados AWS
+   (ex.: API Gateway, Lambda, S3) e o desacoplamento em camadas, ainda que o MVP
+   rode localmente. (C2)
+3. QUANDO viável no tempo do evento, A SOLUÇÃO DEVE descrever a infraestrutura
+   como código (SAM, CDK ou CloudFormation) para os componentes de nuvem. (C2)
+4. A SOLUÇÃO DEVE manter separação de responsabilidades entre apresentação,
+   serviço (regras) e persistência. (C2)
+
+---
+
+### Requisito 11 — Segurança
+
+**User story:** Como responsável pela segurança, quero que o módulo aplique
+autenticação, menor privilégio, validação de entrada e criptografia, para
+proteger a solução e os dados.
+
+**Rastreabilidade:** critério de avaliação C4; complementa o Requisito 8 (LGPD)
+
+#### Critérios de aceitação
+
+1. A SOLUÇÃO DEVE definir a estratégia de autenticação e autorização (Cognito/IAM
+   no caminho de produção; usuário mock no MVP, com a estratégia real documentada).
+   (C4)
+2. AS roles e policies IAM DEVEM seguir o princípio do menor privilégio. (C4)
+3. O SISTEMA DEVE validar e sanitizar as entradas, usando acesso parametrizado ao
+   banco (JPA) para prevenir injeção. (C4)
+4. O SISTEMA NÃO DEVE expor dados sensíveis em logs nem nas respostas da API
+   (reforça o Requisito 8). (C4)
+5. O DESIGN DEVE prever HTTPS e criptografia em trânsito e em repouso (ex.:
+   KMS/S3 SSE) no caminho de produção. (C4)
+
+---
+
+### Requisito 12 — Viabilidade e caminho para produção
+
+**User story:** Como patrocinador no MPF, quero entender o que falta para levar o
+MVP à produção, o custo e a escalabilidade, para avaliar a continuidade.
+
+**Rastreabilidade:** critério de avaliação C6
+
+#### Critérios de aceitação
+
+1. A SOLUÇÃO DEVE documentar o caminho **MVP → produção**, listando o que falta
+   (Km atual real via módulo de Atendimento, autenticação Cognito, FKs reais
+   `FR_VEICULO`/`FR_POSTO`, demais painéis). (C6)
+2. A ARQUITETURA DEVE escalar sem re-arquitetura (serverless/serviços
+   gerenciados), com estimativa realista de custo operacional. (C6)
+3. A SOLUÇÃO DEVE registrar o potencial de reuso do processo de migração assistida
+   para outros módulos/órgãos e manter manutenibilidade (specs, testes,
+   modularidade). (C6)
