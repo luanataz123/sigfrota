@@ -1,0 +1,50 @@
+{
+  "caso": "E01",
+  "arquivo": "E01-cnpj-invalido.png",
+  "objetivo": "CNPJ impresso com dígito verificador inválido: preencher, marcar erro e bloquear o Salvar até corrigir.",
+  "requisitos": [
+    "RQ-REC-04.3",
+    "R14"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": true,
+    "dataLavagem": "2026-09-12",
+    "valorTotal": 70,
+    "nomeEstabelecimento": "LAVA-JATO BOM JESUS",
+    "cnpjEstabelecimento": "94.052.218/0001-34",
+    "idTipoLavagem": 2,
+    "kmVeiculo": null,
+    "placa": "ABC1D23"
+  },
+  "resultadoEsperado": {
+    "status": "CONCLUIDO",
+    "sugestao": {
+      "propriaUnidade": false,
+      "postoConveniado": false,
+      "idPosto": null,
+      "dsPosto": "LAVA-JATO BOM JESUS",
+      "cnpjPosto": "94.052.218/0001-34",
+      "vlLavagem": 70,
+      "dtLavagem": "2026-09-12",
+      "idTipoLavagem": 2,
+      "kmLavagem": null
+    },
+    "alertas": [],
+    "erros": [
+      {
+        "campo": "cnpjPosto",
+        "regra": "CNPJ_DV"
+      },
+      {
+        "campo": "kmLavagem",
+        "regra": "R02"
+      }
+    ]
+  }
+}

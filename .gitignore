@@ -1,9 +1,17 @@
 .kiro/steering/aws-profile.md
 
+# Metadados do Windows ("Mark of the Web") gravados em arquivos baixados
+*Zone.Identifier
+# Dependências e artefatos de build
+node_modules
+dist
+coverage
+*.log
+.DS_Store
+
 # Infraestrutura (CDK)
 infra/cdk.out/
 infra/node_modules/
 
 # Configuração local do front (gerada por scripts/gerar-env-web.mjs)
 web/.env.local
-node_modules

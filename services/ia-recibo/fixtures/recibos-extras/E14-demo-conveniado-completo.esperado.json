@@ -1,0 +1,43 @@
+{
+  "caso": "E14",
+  "arquivo": "E14-demo-conveniado-completo.png",
+  "objetivo": "Recibo da demo ao vivo: posto conveniado 12 do catálogo (reconhecido pelo CNPJ), km impresso, nenhum erro. Data e km posteriores à última lavagem do 101 no seed (2026-09-01, 45.000 km), sem duplicar lavagem existente.",
+  "requisitos": [
+    "RQ-REC-04.1",
+    "RQ-REC-07.4",
+    "R13",
+    "R23"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": true,
+    "dataLavagem": "2026-09-28",
+    "valorTotal": 78,
+    "nomeEstabelecimento": "Auto Posto Planalto",
+    "cnpjEstabelecimento": "55.104.977/0001-40",
+    "idTipoLavagem": 2,
+    "kmVeiculo": 45480,
+    "placa": "ABC1D23"
+  },
+  "resultadoEsperado": {
+    "status": "CONCLUIDO",
+    "sugestao": {
+      "propriaUnidade": false,
+      "postoConveniado": true,
+      "idPosto": 12,
+      "dsPosto": null,
+      "cnpjPosto": null,
+      "vlLavagem": 78,
+      "dtLavagem": "2026-09-28",
+      "idTipoLavagem": 2,
+      "kmLavagem": 45480
+    },
+    "alertas": [],
+    "erros": []
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "caso": "E02",
+  "arquivo": "E02-sem-cnpj-manuscrito.png",
+  "objetivo": "Recibo de bloco preenchido à mão, sem CNPJ: sugerir não conveniado com nome e exigir o CNPJ.",
+  "requisitos": [
+    "RQ-REC-04.4",
+    "R14"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": true,
+    "dataLavagem": "2026-09-15",
+    "valorTotal": 30,
+    "nomeEstabelecimento": "Lavagem do Toninho",
+    "cnpjEstabelecimento": null,
+    "idTipoLavagem": 1,
+    "kmVeiculo": null,
+    "placa": "ABC1D23"
+  },
+  "resultadoEsperado": {
+    "status": "CONCLUIDO",
+    "sugestao": {
+      "propriaUnidade": false,
+      "postoConveniado": false,
+      "idPosto": null,
+      "dsPosto": "Lavagem do Toninho",
+      "cnpjPosto": null,
+      "vlLavagem": 30,
+      "dtLavagem": "2026-09-15",
+      "idTipoLavagem": 1,
+      "kmLavagem": null
+    },
+    "alertas": [],
+    "erros": [
+      {
+        "campo": "cnpjPosto",
+        "regra": "R14"
+      },
+      {
+        "campo": "kmLavagem",
+        "regra": "R02"
+      }
+    ]
+  }
+}

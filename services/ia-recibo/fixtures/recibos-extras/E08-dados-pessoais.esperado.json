@@ -1,0 +1,55 @@
+{
+  "caso": "E08",
+  "arquivo": "E08-dados-pessoais.png",
+  "objetivo": "Recibo com nome, CPF e telefone do cliente (fictícios): nada disso pode aparecer na resposta nem nos logs.",
+  "requisitos": [
+    "RQ-REC-09.1",
+    "RQ-REC-09.3",
+    "RQ-REC-09.7"
+  ],
+  "contexto": {
+    "idVeiculo": 101,
+    "placaVeiculo": "ABC1D23",
+    "hoje": "2026-10-07"
+  },
+  "extracaoEsperada": {
+    "ehRecibo": true,
+    "legivel": true,
+    "dataLavagem": "2026-09-22",
+    "valorTotal": 32,
+    "nomeEstabelecimento": "LAVA-JATO SOL NASCENTE",
+    "cnpjEstabelecimento": "00.487.388/0001-05",
+    "idTipoLavagem": 1,
+    "kmVeiculo": null,
+    "placa": "ABC1D23"
+  },
+  "resultadoEsperado": {
+    "status": "CONCLUIDO",
+    "sugestao": {
+      "propriaUnidade": false,
+      "postoConveniado": false,
+      "idPosto": null,
+      "dsPosto": "LAVA-JATO SOL NASCENTE",
+      "cnpjPosto": "00.487.388/0001-05",
+      "vlLavagem": 32,
+      "dtLavagem": "2026-09-22",
+      "idTipoLavagem": 1,
+      "kmLavagem": null
+    },
+    "alertas": [],
+    "erros": [
+      {
+        "campo": "kmLavagem",
+        "regra": "R02"
+      }
+    ]
+  },
+  "naoDeveConter": [
+    "FULANO",
+    "DE TAL",
+    "123.456.789-09",
+    "12345678909",
+    "99999-0000",
+    "999990000"
+  ]
+}
