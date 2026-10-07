@@ -19,7 +19,8 @@ const esperado = ler('recibos/esperado.json');
 const doTipo = (itens, t) => itens.filter((i) => i.entityType === t);
 const lavagensDe = (itens) => doTipo(itens, 'LAVAGEM');
 
-const CNPJ_LEGADO = '12.345.678/0001-90';
+const CNPJ_LEGADO = '12.345.678/0001-90'; // só no gabarito (igual ao SQL)
+const CNPJ_3398_DEMO = '12.345.678/0001-95'; // DV correto; o demo só tem dados já validados
 const LIMITE = '2026-10-06';
 const TIPOS_ANOMALIA = ['VALOR_ACIMA_MEDIA', 'MESMO_DIA', 'KM_REGREDIDO'];
 
@@ -220,18 +221,21 @@ for (const [nome, itens] of [['gabarito', gabarito], ['demo', demo]]) {
       assert.equal(contador[0].ultimoId, Math.max(...lavagens.map((l) => l.idLavagem)));
     });
 
-    test('todo CNPJ tem dígito válido, exceto o legado da 3398', () => {
+    const ehGabarito = nome === 'gabarito';
+    test(ehGabarito ? 'todo CNPJ tem dígito válido, exceto o legado da 3398' : 'todo CNPJ tem dígito válido, sem exceção', () => {
       for (const l of lavagens) {
         if (l.cnpjPosto == null) continue;
-        if (l.idLavagem === 3398) {
+        if (ehGabarito && l.idLavagem === 3398) {
           assert.equal(l.cnpjPosto, CNPJ_LEGADO);
           assert.equal(cnpjValido(l.cnpjPosto), false);
         } else {
           assert.ok(cnpjValido(l.cnpjPosto), `cnpj inválido na lavagem ${l.idLavagem}: ${l.cnpjPosto}`);
         }
       }
+      if (ehGabarito) return; // postos do gabarito não têm cnpj (checado em 'catálogo só com o que o SQL tem')
       for (const p of doTipo(itens, 'POSTO')) {
-        if ('cnpj' in p) assert.ok(cnpjValido(p.cnpj), `cnpj inválido no posto ${p.idPosto}`);
+        assert.ok(typeof p.cnpj === 'string', `posto ${p.idPosto} sem cnpj`);
+        assert.ok(cnpjValido(p.cnpj), `cnpj inválido no posto ${p.idPosto}: ${p.cnpj}`);
       }
     });
   });
@@ -244,7 +248,7 @@ describe('demo', () => {
   const tipos = new Map(doTipo(demo, 'TIPO_LAVAGEM').map((t) => [t.idTipoLavagem, t]));
   const veiculos = doTipo(demo, 'VEICULO');
 
-  test('é superconjunto do gabarito', () => {
+  test('é superconjunto do gabarito (exceto cnpjPosto da 3398, corrigido no demo)', () => {
     const porChave = new Map(demo.map((i) => [`${i.PK}|${i.SK}`, i]));
     for (const g of gabarito) {
       if (g.entityType === 'CONTADOR') continue;
@@ -256,6 +260,9 @@ describe('demo', () => {
       } else if (g.entityType === 'POSTO') {
         const { cnpj, ...resto } = d;
         assert.deepEqual(resto, g);
+      } else if (g.entityType === 'LAVAGEM' && g.idLavagem === 3398) {
+        assert.equal(d.cnpjPosto, CNPJ_3398_DEMO);
+        assert.deepEqual({ ...d, cnpjPosto: g.cnpjPosto }, g);
       } else {
         assert.deepEqual(d, g);
       }

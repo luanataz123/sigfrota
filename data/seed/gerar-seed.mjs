@@ -102,7 +102,11 @@ function calcularDV(base12) {
   const d2 = dv([...d, d1], [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
   return `${d1}${d2}`;
 }
-const cnpjsUsados = new Set(['12345678000190']);
+const cnpjValido = (cnpj) => {
+  const num = String(cnpj).replace(/\D/g, '');
+  return /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj) && calcularDV(num.slice(0, 12)) === num.slice(12);
+};
+const cnpjsUsados = new Set(['12345678000190', '12345678000195']);
 function gerarCnpj() {
   for (;;) {
     let raiz = '';
@@ -376,7 +380,11 @@ for (const v of veiculosNovos) {
   v.kmAtual = maxKm + int(0, 800);
 }
 
-const lavagensDemo = [...LAVAGENS_ORIGINAIS, ...novas].map(itemLavagem);
+// O demo só tem dados já validados pelo sistema: a 3398 recebe o CNPJ com DV correto
+// ('-95'); o gabarito mantém o '-90' inválido do SQL.
+const CNPJ_3398_DEMO = '12.345.678/0001-95';
+const originaisDemo = LAVAGENS_ORIGINAIS.map((l) => (l.idLavagem === 3398 ? { ...l, cnpjPosto: CNPJ_3398_DEMO } : l));
+const lavagensDemo = [...originaisDemo, ...novas].map(itemLavagem);
 const demo = ordenarItens([
   ...TIPOS.map((t) => itemTipo(t, true)),
   ...[...VEICULOS_ORIGINAIS, ...veiculosNovos].map(itemVeiculo),
@@ -459,7 +467,9 @@ function verificar(cond, msg) {
     verificar(l.kmLavagem > 0 && l.kmLavagem <= 999999 && Number.isInteger(l.kmLavagem), `km ${l.idLavagem}`);
     verificar(l.vlLavagem == null || (l.vlLavagem > 0 && l.vlLavagem <= 999.99), `valor ${l.idLavagem}`);
     verificar(parseISO(l.dtCadastro) <= LIMITE && parseISO(l.dtLavagem) <= LIMITE, `data ${l.idLavagem}`);
+    verificar(l.cnpjPosto == null || cnpjValido(l.cnpjPosto), `cnpj ${l.idLavagem}`);
   }
+  for (const p of postosConveniados) verificar(cnpjValido(p.cnpj), `cnpj do posto ${p.idPosto}`);
   const ncPares = new Set(novas.filter((l) => l.postoConveniado === false).map((l) => l.dsPosto + '|' + l.cnpjPosto));
   verificar(ncPares.size === 5, 'cinco postos não conveniados usados');
   for (const id of new Set(novas.map((l) => l.idVeiculo))) {

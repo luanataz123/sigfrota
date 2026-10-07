@@ -4,6 +4,7 @@
   "private": true,
   "description": "Dados sintéticos (fictícios) do módulo de Lavagem do SIG Frota para carga no DynamoDB",
   "type": "module",
+  "main": "seed.test.mjs",
   "scripts": {
     "gerar": "node gerar-seed.mjs",
     "test": "node --test"
