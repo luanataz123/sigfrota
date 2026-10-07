@@ -10,6 +10,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
+import { BotaoArquitetura } from './DiagramaArquitetura';
 
 /** Item do breadcrumb; o último (sem `to`) é a página atual. */
 export interface MigalhaItem {
@@ -47,7 +48,11 @@ export function BarraSuperior({ children }: { children?: ReactNode }) {
             <span className="text-xs text-blue-100/80">Ministério Público Federal</span>
           </span>
         </Link>
-        {children}
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Diagrama da arquitetura AWS, disponível em todas as telas. */}
+          <BotaoArquitetura />
+          {children}
+        </div>
       </div>
     </header>
   );
