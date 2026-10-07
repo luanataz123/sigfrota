@@ -21,7 +21,7 @@ O atendente abre a tela de um veículo, clica em **Incluir Lavagem**, preenche o
 | `lavagem-sintetico.sql` | DDL + dados fictícios (`FR_LAVAGEM`, `FR_TIPO_LAVAGEM`, mocks de veículo e posto) |
 | `lavagem-apex-trecho-ilustrativo.md` | Trechos PL/SQL do APEX: o "antes" da migração |
 | `lavagem-gabarito-regras.md` | Gabarito com as regras R01–R23 e casos de teste |
-| `INSTRUÇÃO NORMATIVA SGMPF Nº 29/2023.pdf` | Norma de uso da frota (contexto de domínio) |
+| `INSTRUÇÃO NORMATIVA SGMPF Nº 29/2023.pdf` | Acessibilidade (e-MAG/WCAG): soluções do MPF só entram em produção com nota ≥ 70% na verificação automatizada ("parcialmente acessível") e análise humana |
 | `Orientação Técnica nº 17 - Privacidade desde o projeto.pdf` | Privacy by Design / LGPD |
 | `../criterios-avaliacao-hackathon.html` | Critérios de avaliação da banca |
 
@@ -46,7 +46,7 @@ O atendente abre a tela de um veículo, clica em **Incluir Lavagem**, preenche o
 |---|----------|--------------------------|
 | 1 | Atendimento aos Requisitos | Cobrir R01–R23, demo ponta a ponta com os dados sintéticos, casos de teste do gabarito passando |
 | 2 | Arquitetura AWS | Serverless (Lambda, API Gateway, S3, DynamoDB), eventos (S3 → Step Functions), IaC (SAM ou CDK), Bedrock nas features de IA |
-| 3 | Inovação e Criatividade | Specs, hooks e steering do Kiro como parte do processo; UX simples para o atendente |
+| 3 | Inovação e Criatividade | Specs, hooks e steering do Kiro como parte do processo; UX simples e acessível para o atendente (e-MAG/WCAG, IN SGMPF nº 29/2023) |
 | 4 | Segurança | Cognito, IAM com menor privilégio, validação de entrada, dados sensíveis fora de logs, criptografia em trânsito e em repouso, LGPD (Privacy by Design, OT nº 17) |
 | 5 | Apresentação | Problema → solução → demo → resultados → próximos passos, dentro de 5 min |
 | 6 | Viabilidade e Escalabilidade | Caminho MVP → produção, estimativa de custo, reuso por outros módulos/órgãos, testes e documentação |

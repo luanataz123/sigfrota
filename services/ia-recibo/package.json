@@ -1,0 +1,13 @@
+{
+  "name": "@sigfrota/ia-recibo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Spec 6 (ia-leitura-recibo): leitura do recibo de lavagem com Bedrock",
+  "scripts": {
+    "gerar:recibos-extras": "node fixtures/recibos-extras/gerar.mjs"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "2.6.2"
+  }
+}
