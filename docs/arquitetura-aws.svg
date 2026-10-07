@@ -1,0 +1,265 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1010" width="1500" height="1010" font-family="Amazon Ember, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="titulo desc">
+  <title id="titulo">Arquitetura AWS do SIG Frota — Módulo de Lavagem</title>
+  <desc id="desc">Diagrama serverless: CloudFront e S3 para o front React, Cognito para login, API Gateway HTTP com authorizer JWT, Lambdas Node.js com o módulo de domínio, DynamoDB tabela única; fluxos de IA com S3, EventBridge, Step Functions e Bedrock para leitura de recibo e extração de regras do PL/SQL; IAM, KMS, CloudWatch, SSM e CloudFormation/CDK transversais.</desc>
+
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#232F3E"/>
+    </marker>
+    <marker id="setaCinza" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7D8998"/>
+    </marker>
+
+    <!-- Ícones no estilo AWS (cores por categoria) -->
+    <symbol id="i-cloudfront" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#8C4FFF"/>
+      <circle cx="32" cy="32" r="17" fill="none" stroke="#fff" stroke-width="3"/>
+      <ellipse cx="32" cy="32" rx="7" ry="17" fill="none" stroke="#fff" stroke-width="2.5"/>
+      <line x1="15" y1="32" x2="49" y2="32" stroke="#fff" stroke-width="2.5"/>
+    </symbol>
+    <symbol id="i-apigw" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#8C4FFF"/>
+      <text x="32" y="42" text-anchor="middle" font-size="28" font-weight="700" fill="#fff">{ }</text>
+    </symbol>
+    <symbol id="i-s3" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#7AA116"/>
+      <ellipse cx="32" cy="20" rx="17" ry="6" fill="none" stroke="#fff" stroke-width="3"/>
+      <path d="M15 20 L20 46 Q32 52 44 46 L49 20" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-lambda" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#ED7100"/>
+      <text x="32" y="46" text-anchor="middle" font-size="38" font-weight="700" fill="#fff">λ</text>
+    </symbol>
+    <symbol id="i-dynamo" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#C925D1"/>
+      <ellipse cx="32" cy="18" rx="15" ry="5" fill="none" stroke="#fff" stroke-width="3"/>
+      <path d="M17 18 V46 Q32 54 47 46 V18" fill="none" stroke="#fff" stroke-width="3"/>
+      <path d="M17 32 Q32 40 47 32" fill="none" stroke="#fff" stroke-width="2.5"/>
+    </symbol>
+    <symbol id="i-cognito" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#DD344C"/>
+      <circle cx="32" cy="24" r="8" fill="none" stroke="#fff" stroke-width="3"/>
+      <path d="M17 49 Q17 35 32 35 Q47 35 47 49" fill="none" stroke="#fff" stroke-width="3"/>
+    </symbol>
+    <symbol id="i-eventbridge" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#E7157B"/>
+      <circle cx="32" cy="32" r="6" fill="#fff"/>
+      <circle cx="16" cy="18" r="4" fill="#fff"/><circle cx="48" cy="18" r="4" fill="#fff"/>
+      <circle cx="16" cy="46" r="4" fill="#fff"/><circle cx="48" cy="46" r="4" fill="#fff"/>
+      <path d="M16 18 L32 32 L48 18 M16 46 L32 32 L48 46" stroke="#fff" stroke-width="2.5" fill="none"/>
+    </symbol>
+    <symbol id="i-sfn" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#E7157B"/>
+      <rect x="24" y="10" width="16" height="11" rx="2" fill="#fff"/>
+      <rect x="10" y="43" width="16" height="11" rx="2" fill="#fff"/>
+      <rect x="38" y="43" width="16" height="11" rx="2" fill="#fff"/>
+      <path d="M32 21 V32 M18 43 V32 H46 V43" stroke="#fff" stroke-width="2.5" fill="none"/>
+    </symbol>
+    <symbol id="i-bedrock" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#01A88D"/>
+      <polygon points="32,10 51,21 51,43 32,54 13,43 13,21" fill="none" stroke="#fff" stroke-width="3"/>
+      <path d="M32 22 L35 29 L42 32 L35 35 L32 42 L29 35 L22 32 L29 29 Z" fill="#fff"/>
+    </symbol>
+    <symbol id="i-iam" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#DD344C"/>
+      <rect x="18" y="29" width="28" height="22" rx="3" fill="#fff"/>
+      <path d="M23 29 V22 Q23 13 32 13 Q41 13 41 22 V29" fill="none" stroke="#fff" stroke-width="3.5"/>
+    </symbol>
+    <symbol id="i-kms" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#DD344C"/>
+      <circle cx="22" cy="32" r="9" fill="none" stroke="#fff" stroke-width="3.5"/>
+      <path d="M31 32 H52 M45 32 V40 M51 32 V38" stroke="#fff" stroke-width="3.5" fill="none"/>
+    </symbol>
+    <symbol id="i-cloudwatch" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#E7157B"/>
+      <circle cx="28" cy="28" r="14" fill="none" stroke="#fff" stroke-width="3"/>
+      <path d="M38 38 L50 50" stroke="#fff" stroke-width="4"/>
+      <path d="M19 31 L25 25 L30 30 L37 22" stroke="#fff" stroke-width="2.5" fill="none"/>
+    </symbol>
+    <symbol id="i-ssm" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#E7157B"/>
+      <rect x="14" y="14" width="36" height="36" rx="3" fill="none" stroke="#fff" stroke-width="3"/>
+      <path d="M21 25 H43 M21 32 H43 M21 39 H35" stroke="#fff" stroke-width="3"/>
+    </symbol>
+    <symbol id="i-cfn" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="6" fill="#E7157B"/>
+      <path d="M32 12 L52 22 L32 32 L12 22 Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M12 32 L32 42 L52 32 M12 42 L32 52 L52 42" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-usuario" viewBox="0 0 64 64">
+      <circle cx="32" cy="20" r="11" fill="#232F3E"/>
+      <path d="M10 60 Q10 36 32 36 Q54 36 54 60 Z" fill="#232F3E"/>
+    </symbol>
+  </defs>
+
+  <rect width="1500" height="1010" fill="#ffffff"/>
+
+  <!-- Título -->
+  <text x="30" y="40" font-size="24" font-weight="700" fill="#232F3E">SIG Frota · Módulo de Lavagem — Arquitetura serverless na AWS</text>
+  <text x="30" y="62" font-size="13" fill="#545B64">Migração APEX → serverless assistida por IA · Node.js + React · IaC em AWS CDK · região us-east-1</text>
+
+  <!-- Usuário -->
+  <use href="#i-usuario" x="40" y="400" width="64" height="64"/>
+  <text x="72" y="482" text-anchor="middle" font-size="13" font-weight="700" fill="#232F3E">Usuário</text>
+  <text x="72" y="498" text-anchor="middle" font-size="11" fill="#545B64">atendente / gestor</text>
+  <text x="72" y="512" text-anchor="middle" font-size="11" fill="#545B64">(navegador)</text>
+
+  <!-- Nuvem AWS -->
+  <rect x="160" y="80" width="1310" height="820" fill="none" stroke="#232F3E" stroke-width="2"/>
+  <rect x="160" y="80" width="190" height="26" fill="#232F3E"/>
+  <text x="172" y="98" font-size="13" font-weight="700" fill="#fff">AWS Cloud · us-east-1</text>
+
+  <!-- Grupo A: Front e autenticação -->
+  <rect x="190" y="120" width="820" height="165" rx="4" fill="#F7F3FF" stroke="#8C4FFF" stroke-dasharray="6 4"/>
+  <text x="202" y="140" font-size="13" font-weight="700" fill="#5A30B5">MVP · Front e autenticação</text>
+  <use href="#i-cloudfront" x="230" y="155" width="64" height="64"/>
+  <text x="262" y="238" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">CloudFront</text>
+  <text x="262" y="253" text-anchor="middle" font-size="11" fill="#545B64">HTTPS · CSP · SPA</text>
+  <use href="#i-s3" x="430" y="155" width="64" height="64"/>
+  <text x="462" y="238" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">S3 · site</text>
+  <text x="462" y="253" text-anchor="middle" font-size="11" fill="#545B64">React + Tailwind (privado)</text>
+  <use href="#i-cognito" x="700" y="155" width="64" height="64"/>
+  <text x="732" y="238" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">Amazon Cognito</text>
+  <text x="732" y="253" text-anchor="middle" font-size="11" fill="#545B64">User Pool · grupos atendente/gestor</text>
+
+  <line x1="294" y1="187" x2="428" y2="187" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="361" y="180" text-anchor="middle" font-size="11" fill="#545B64">OAC</text>
+
+  <!-- Grupo B: API de Lavagens -->
+  <rect x="190" y="305" width="820" height="190" rx="4" fill="#FFF6EE" stroke="#ED7100" stroke-dasharray="6 4"/>
+  <text x="202" y="325" font-size="13" font-weight="700" fill="#B35400">MVP · API de Lavagens (R01–R23)</text>
+  <use href="#i-apigw" x="230" y="350" width="64" height="64"/>
+  <text x="262" y="433" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">API Gateway</text>
+  <text x="262" y="448" text-anchor="middle" font-size="11" fill="#545B64">HTTP API · authorizer JWT</text>
+  <use href="#i-lambda" x="500" y="350" width="64" height="64"/>
+  <text x="532" y="433" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">AWS Lambda (Node.js)</text>
+  <text x="532" y="448" text-anchor="middle" font-size="11" fill="#545B64">1 função por rota · IAM mínimo</text>
+  <rect x="452" y="458" width="160" height="22" rx="11" fill="#fff" stroke="#ED7100"/>
+  <text x="532" y="473" text-anchor="middle" font-size="11" fill="#B35400">packages/dominio (R02–R15)</text>
+  <use href="#i-dynamo" x="900" y="350" width="64" height="64"/>
+  <text x="932" y="433" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">DynamoDB</text>
+  <text x="932" y="448" text-anchor="middle" font-size="11" fill="#545B64">sigfrota-lavagem</text>
+  <text x="932" y="462" text-anchor="middle" font-size="11" fill="#545B64">tabela única · PK/SK</text>
+
+  <line x1="294" y1="382" x2="498" y2="382" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="396" y="374" text-anchor="middle" font-size="11" fill="#545B64">/veiculos/{id}/lavagens…</text>
+  <line x1="564" y1="382" x2="898" y2="382" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="731" y="374" text-anchor="middle" font-size="11" fill="#545B64">Query · Get · Put condicional · contador</text>
+
+  <!-- Cognito → authorizer -->
+  <path d="M732 260 V292 H262 V348" fill="none" stroke="#7D8998" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#setaCinza)"/>
+  <text x="742" y="276" font-size="11" fill="#545B64">valida JWT · cadastrador = sub (R08)</text>
+
+  <!-- Grupo C: Leitura de recibo -->
+  <rect x="190" y="515" width="820" height="170" rx="4" fill="#F1FBF8" stroke="#01A88D" stroke-dasharray="6 4"/>
+  <text x="202" y="535" font-size="13" font-weight="700" fill="#017A66">Spec 6 · Leitura de recibo com IA (orientado a eventos)</text>
+  <use href="#i-s3" x="230" y="550" width="64" height="64"/>
+  <text x="262" y="633" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">S3 · recibos</text>
+  <text x="262" y="648" text-anchor="middle" font-size="11" fill="#545B64">URL pré-assinada · lifecycle</text>
+  <use href="#i-eventbridge" x="380" y="550" width="64" height="64"/>
+  <text x="412" y="633" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">EventBridge</text>
+  <text x="412" y="648" text-anchor="middle" font-size="11" fill="#545B64">Object Created</text>
+  <use href="#i-sfn" x="530" y="550" width="64" height="64"/>
+  <text x="562" y="633" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">Step Functions</text>
+  <text x="562" y="648" text-anchor="middle" font-size="11" fill="#545B64">orquestra extração</text>
+  <use href="#i-bedrock" x="700" y="550" width="64" height="64"/>
+  <text x="732" y="633" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">Amazon Bedrock</text>
+  <text x="732" y="648" text-anchor="middle" font-size="11" fill="#545B64">multimodal · valor/data/posto/CNPJ</text>
+
+  <line x1="294" y1="582" x2="378" y2="582" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <line x1="444" y1="582" x2="528" y2="582" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <line x1="594" y1="582" x2="698" y2="582" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="646" y="574" text-anchor="middle" font-size="11" fill="#545B64">InvokeModel</text>
+  <!-- sugestão gravada no DynamoDB -->
+  <path d="M562 550 V505 H990 V382 H966" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="980" y="548" text-anchor="end" font-size="11" fill="#545B64">grava sugestão → front revisa e confirma</text>
+  <!-- apaga imagem (LGPD) -->
+  <path d="M562 655 V672 H262 V660" fill="none" stroke="#7D8998" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#setaCinza)"/>
+  <text x="412" y="668" text-anchor="middle" font-size="11" fill="#545B64">apaga a imagem ao fim (LGPD)</text>
+
+  <!-- Grupo D: Extração de regras -->
+  <rect x="190" y="705" width="820" height="180" rx="4" fill="#F1FBF8" stroke="#01A88D" stroke-dasharray="6 4"/>
+  <text x="202" y="725" font-size="13" font-weight="700" fill="#017A66">Spec 5 · Extração de regras do PL/SQL com IA (rastreabilidade Rxx → origem)</text>
+  <use href="#i-s3" x="230" y="740" width="64" height="64"/>
+  <text x="262" y="823" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">S3 · legado</text>
+  <text x="262" y="838" text-anchor="middle" font-size="11" fill="#545B64">upload do SQL APEX</text>
+  <use href="#i-eventbridge" x="380" y="740" width="64" height="64"/>
+  <text x="412" y="823" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">EventBridge</text>
+  <use href="#i-sfn" x="530" y="740" width="64" height="64"/>
+  <text x="562" y="823" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">Step Functions</text>
+  <use href="#i-bedrock" x="700" y="740" width="64" height="64"/>
+  <text x="732" y="823" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">Amazon Bedrock</text>
+  <text x="732" y="838" text-anchor="middle" font-size="11" fill="#545B64">regras em JSON + trecho de origem</text>
+  <use href="#i-s3" x="900" y="740" width="64" height="64"/>
+  <text x="932" y="823" text-anchor="middle" font-size="12" font-weight="700" fill="#232F3E">S3 · resultados</text>
+  <text x="932" y="838" text-anchor="middle" font-size="11" fill="#545B64">precisão % vs gabarito</text>
+
+  <line x1="294" y1="772" x2="378" y2="772" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <line x1="444" y1="772" x2="528" y2="772" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <line x1="594" y1="772" x2="698" y2="772" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="646" y="764" text-anchor="middle" font-size="11" fill="#545B64">InvokeModel</text>
+  <path d="M562 840 V866 H932 V842" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="747" y="861" text-anchor="middle" font-size="11" fill="#545B64">compara com o gabarito R01–R23</text>
+
+  <!-- Fluxos do usuário -->
+  <path d="M72 398 V100 H732 V153" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="420" y="95" text-anchor="middle" font-size="11" fill="#545B64">login (SRP) → access token</text>
+  <line x1="104" y1="418" x2="228" y2="200" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="140" y="300" font-size="11" fill="#545B64" transform="rotate(-60 140 300)">HTTPS</text>
+  <line x1="106" y1="432" x2="228" y2="388" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="138" y="444" font-size="11" fill="#545B64" transform="rotate(-20 138 444)">Bearer JWT</text>
+  <line x1="104" y1="450" x2="228" y2="575" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="112" y="520" font-size="11" fill="#545B64" transform="rotate(45 112 520)">foto do recibo</text>
+
+  <!-- Painel transversal -->
+  <rect x="1040" y="120" width="410" height="765" rx="4" fill="#F7F8F8" stroke="#7D8998" stroke-dasharray="6 4"/>
+  <text x="1052" y="140" font-size="13" font-weight="700" fill="#232F3E">Segurança, observabilidade e IaC</text>
+
+  <use href="#i-iam" x="1080" y="160" width="56" height="56"/>
+  <text x="1150" y="182" font-size="12" font-weight="700" fill="#232F3E">AWS IAM</text>
+  <text x="1150" y="198" font-size="11" fill="#545B64">role exclusiva por Lambda,</text>
+  <text x="1150" y="212" font-size="11" fill="#545B64">ações e ARNs específicos (cdk-nag)</text>
+
+  <use href="#i-kms" x="1080" y="240" width="56" height="56"/>
+  <text x="1150" y="262" font-size="12" font-weight="700" fill="#232F3E">AWS KMS</text>
+  <text x="1150" y="278" font-size="11" fill="#545B64">criptografia em repouso</text>
+  <text x="1150" y="292" font-size="11" fill="#545B64">DynamoDB (PITR) e S3 (SSE)</text>
+
+  <use href="#i-cloudwatch" x="1080" y="320" width="56" height="56"/>
+  <text x="1150" y="342" font-size="12" font-weight="700" fill="#232F3E">Amazon CloudWatch</text>
+  <text x="1150" y="358" font-size="11" fill="#545B64">logs de Lambda e access logs</text>
+  <text x="1150" y="372" font-size="11" fill="#545B64">sem dado pessoal, retenção definida</text>
+
+  <use href="#i-ssm" x="1080" y="400" width="56" height="56"/>
+  <text x="1150" y="422" font-size="12" font-weight="700" fill="#232F3E">SSM Parameter Store</text>
+  <text x="1150" y="438" font-size="11" fill="#545B64">contrato de infra /sigfrota/…</text>
+  <text x="1150" y="452" font-size="11" fill="#545B64">compartilhado entre stacks</text>
+
+  <use href="#i-cfn" x="1080" y="480" width="56" height="56"/>
+  <text x="1150" y="502" font-size="12" font-weight="700" fill="#232F3E">CloudFormation · AWS CDK</text>
+  <text x="1150" y="518" font-size="11" fill="#545B64">SigfrotaBase · SigfrotaApi ·</text>
+  <text x="1150" y="532" font-size="11" fill="#545B64">SigfrotaIaRegras · SigfrotaIaRecibo</text>
+
+  <line x1="1060" y1="562" x2="1430" y2="562" stroke="#D5DBDB"/>
+  <text x="1060" y="586" font-size="12" font-weight="700" fill="#232F3E">LGPD · Privacy by Design (OT nº 17)</text>
+  <text x="1060" y="606" font-size="11" fill="#545B64">• dados sintéticos; cadastrador só por ID (sub)</text>
+  <text x="1060" y="624" font-size="11" fill="#545B64">• imagem do recibo apagada após a extração</text>
+  <text x="1060" y="642" font-size="11" fill="#545B64">• logs sem corpo, token ou CNPJ</text>
+  <text x="1060" y="660" font-size="11" fill="#545B64">• HTTPS em todo o tráfego (TLS)</text>
+
+  <line x1="1060" y1="684" x2="1430" y2="684" stroke="#D5DBDB"/>
+  <text x="1060" y="708" font-size="12" font-weight="700" fill="#232F3E">Legenda</text>
+  <line x1="1060" y1="728" x2="1110" y2="728" stroke="#232F3E" stroke-width="2" marker-end="url(#seta)"/>
+  <text x="1120" y="732" font-size="11" fill="#545B64">fluxo de dados / requisição</text>
+  <line x1="1060" y1="750" x2="1110" y2="750" stroke="#7D8998" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#setaCinza)"/>
+  <text x="1120" y="754" font-size="11" fill="#545B64">controle (autorização, limpeza)</text>
+  <rect x="1060" y="768" width="50" height="18" rx="3" fill="#FFF6EE" stroke="#ED7100" stroke-dasharray="6 4"/>
+  <text x="1120" y="781" font-size="11" fill="#545B64">MVP (fluxo principal da demo)</text>
+  <rect x="1060" y="796" width="50" height="18" rx="3" fill="#F1FBF8" stroke="#01A88D" stroke-dasharray="6 4"/>
+  <text x="1120" y="809" font-size="11" fill="#545B64">features de IA (Bedrock)</text>
+
+  <!-- Desenvolvimento -->
+  <rect x="160" y="925" width="1310" height="62" rx="4" fill="#232F3E"/>
+  <text x="180" y="950" font-size="13" font-weight="700" fill="#FF9900">Desenvolvimento assistido</text>
+  <text x="180" y="972" font-size="12" fill="#ffffff">Kiro (specs · steering · hooks)  →  monorepo (web · services/api · packages/dominio · infra)  →  cdk deploy --profile hackaton  →  CloudFormation</text>
+</svg>
