@@ -74,14 +74,14 @@ describe('HttpLavagemClient — contrato HTTP', () => {
     expect(resultado).toEqual(veiculo);
   });
 
-  it('R21: obterLavagem faz GET /lavagens/{id}', async () => {
+  it('R21: obterLavagem faz GET /veiculos/{idVeiculo}/lavagens/{id}', async () => {
     const lavagem: Lavagem = { ...lavagemBase, idLavagem: 7 };
     const fetchMock = fetchQueRetorna(respostaJson(lavagem));
     const client = criarClient(fetchMock);
 
-    const resultado = await client.obterLavagem(7);
+    const resultado = await client.obterLavagem(101, 7);
 
-    expect(primeiraChamada(fetchMock).url).toBe(`${BASE_URL}/lavagens/7`);
+    expect(primeiraChamada(fetchMock).url).toBe(`${BASE_URL}/veiculos/101/lavagens/7`);
     expect(resultado).toEqual(lavagem);
   });
 
@@ -95,7 +95,7 @@ describe('HttpLavagemClient — contrato HTTP', () => {
     expect(primeiraChamada(postosMock).url).toBe(`${BASE_URL}/postos`);
   });
 
-  it('R17: criarLavagem faz POST com Content-Type JSON e body serializado', async () => {
+  it('R17: criarLavagem faz POST no veículo do payload, com Content-Type JSON e body serializado', async () => {
     const criada: Lavagem = { ...lavagemBase, idLavagem: 42 };
     const fetchMock = fetchQueRetorna(respostaJson(criada, 201));
     const client = criarClient(fetchMock);
@@ -103,22 +103,22 @@ describe('HttpLavagemClient — contrato HTTP', () => {
     const resultado = await client.criarLavagem(lavagemBase);
 
     const { url, init, headers } = primeiraChamada(fetchMock);
-    expect(url).toBe(`${BASE_URL}/lavagens`);
+    expect(url).toBe(`${BASE_URL}/veiculos/101/lavagens`);
     expect(init.method).toBe('POST');
     expect(headers.get('Content-Type')).toBe('application/json');
     expect(init.body).toBe(JSON.stringify(lavagemBase));
     expect(resultado).toEqual(criada);
   });
 
-  it('R17: atualizarLavagem faz PUT /lavagens/{id} com body JSON', async () => {
+  it('R17: atualizarLavagem faz PUT /veiculos/{idVeiculo}/lavagens/{id} com body JSON', async () => {
     const atualizada: Lavagem = { ...lavagemBase, idLavagem: 42, kmLavagem: 51234 };
     const fetchMock = fetchQueRetorna(respostaJson(atualizada));
     const client = criarClient(fetchMock);
 
-    const resultado = await client.atualizarLavagem(42, atualizada);
+    const resultado = await client.atualizarLavagem(101, 42, atualizada);
 
     const { url, init } = primeiraChamada(fetchMock);
-    expect(url).toBe(`${BASE_URL}/lavagens/42`);
+    expect(url).toBe(`${BASE_URL}/veiculos/101/lavagens/42`);
     expect(init.method).toBe('PUT');
     expect(init.body).toBe(JSON.stringify(atualizada));
     expect(resultado).toEqual(atualizada);
@@ -128,10 +128,10 @@ describe('HttpLavagemClient — contrato HTTP', () => {
     const fetchMock = fetchQueRetorna(new Response(null, { status: 204 }));
     const client = criarClient(fetchMock);
 
-    const resultado = await client.excluirLavagem(42);
+    const resultado = await client.excluirLavagem(101, 42);
 
     const { url, init } = primeiraChamada(fetchMock);
-    expect(url).toBe(`${BASE_URL}/lavagens/42`);
+    expect(url).toBe(`${BASE_URL}/veiculos/101/lavagens/42`);
     expect(init.method).toBe('DELETE');
     expect(resultado).toBeUndefined();
   });

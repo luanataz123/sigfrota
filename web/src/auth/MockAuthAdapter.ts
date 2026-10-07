@@ -6,14 +6,10 @@
 // integração real com Cognito (mesmo contrato) pertence ao spec `infra-base`.
 
 import type { AuthAdapter, Credenciais, Sessao, Usuario } from './AuthProvider';
+import { CredenciaisInvalidasError } from './erros';
 
-/** Erro de credenciais inválidas, exibível na tela de login (tarefa 3.2). */
-export class CredenciaisInvalidasError extends Error {
-  constructor(message = 'E-mail ou senha inválidos.') {
-    super(message);
-    this.name = 'CredenciaisInvalidasError';
-  }
-}
+// Reexportado para manter os imports existentes (LoginPage e testes).
+export { CredenciaisInvalidasError };
 
 interface ContaMock extends Usuario {
   senha: string;

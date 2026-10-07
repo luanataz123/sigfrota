@@ -1,0 +1,21 @@
+{
+  "name": "@sigfrota/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Spec 3 (api-lavagens): Lambdas da API REST do módulo de Lavagem (R01, R05–R08, R16–R21)",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.1147.0",
+    "@aws-sdk/lib-dynamodb": "3.1147.0",
+    "@sigfrota/dominio": "*"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.4",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
+  }
+}

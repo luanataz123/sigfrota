@@ -7,7 +7,8 @@
 //
 // Variáveis de ambiente (coerentes com `web/.env.example`):
 //  - VITE_USE_MOCK   : 'true' usa o MockLavagemClient; 'false' usa o HTTP.
-//  - VITE_API_BASE_URL: base URL da API quando VITE_USE_MOCK=false (Req. 11.1).
+//  - VITE_API_URL    : base URL da API quando VITE_USE_MOCK=false (Req. 11.1),
+//                      gerada por `npm run env-web -w infra` (output ApiUrl).
 
 import type { LavagemClient } from './LavagemClient';
 import { MockLavagemClient } from './MockLavagemClient';
@@ -36,7 +37,7 @@ export type ClientFactoryOptions = Pick<
  * Cria o `LavagemClient` apropriado ao ambiente (Req. 11.2).
  *
  * - `VITE_USE_MOCK=true`  → `MockLavagemClient` (Req. 11.2/11.3).
- * - `VITE_USE_MOCK=false` → `HttpLavagemClient` com `VITE_API_BASE_URL`
+ * - `VITE_USE_MOCK=false` → `HttpLavagemClient` com `VITE_API_URL`
  *   (Req. 11.1); injeta token (Req. 1.3) e tratamento de 401 (Req. 1.4) quando
  *   fornecidos.
  */
@@ -47,11 +48,11 @@ export function criarLavagemClient(
     return new MockLavagemClient();
   }
 
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  const baseUrl = import.meta.env.VITE_API_URL;
   if (!baseUrl) {
     // Falha cedo: HTTP sem base URL é erro de configuração (Req. 11.1).
     throw new Error(
-      'VITE_API_BASE_URL não configurada: defina a base da API ou use VITE_USE_MOCK=true.',
+      'VITE_API_URL não configurada: rode "npm run env-web -w infra" ou use VITE_USE_MOCK=true.',
     );
   }
 

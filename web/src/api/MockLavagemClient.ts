@@ -113,10 +113,13 @@ export class MockLavagemClient implements LavagemClient {
     return clone(veiculo); // R16 (kmAtual read-only)
   }
 
-  async obterLavagem(id: number): Promise<Lavagem> {
+  async obterLavagem(idVeiculo: number, id: number): Promise<Lavagem> {
     await this.atraso();
     this.talvezFalhar();
-    const lavagem = this.lavagens.find((l) => l.idLavagem === id);
+    // Como na API: a lavagem é buscada sob o veículo da rota.
+    const lavagem = this.lavagens.find(
+      (l) => l.idLavagem === id && l.idVeiculo === idVeiculo,
+    );
     if (!lavagem) {
       throw new MockLavagemError(`Lavagem ${id} não encontrada.`);
     }
@@ -146,22 +149,29 @@ export class MockLavagemClient implements LavagemClient {
     return clone(nova);
   }
 
-  async atualizarLavagem(id: number, dados: Lavagem): Promise<Lavagem> {
+  /** Índice da lavagem `id` do veículo `idVeiculo`, ou -1. */
+  private indiceDe(idVeiculo: number, id: number): number {
+    return this.lavagens.findIndex(
+      (l) => l.idLavagem === id && l.idVeiculo === idVeiculo,
+    );
+  }
+
+  async atualizarLavagem(idVeiculo: number, id: number, dados: Lavagem): Promise<Lavagem> {
     await this.atraso();
     this.talvezFalhar();
-    const indice = this.lavagens.findIndex((l) => l.idLavagem === id);
+    const indice = this.indiceDe(idVeiculo, id);
     if (indice === -1) {
       throw new MockLavagemError(`Lavagem ${id} não encontrada.`);
     }
-    const atualizada: Lavagem = { ...clone(dados), idLavagem: id };
+    const atualizada: Lavagem = { ...clone(dados), idVeiculo, idLavagem: id };
     this.lavagens[indice] = atualizada; // R17 (PUT)
     return clone(atualizada);
   }
 
-  async excluirLavagem(id: number): Promise<void> {
+  async excluirLavagem(idVeiculo: number, id: number): Promise<void> {
     await this.atraso();
     this.talvezFalhar();
-    const indice = this.lavagens.findIndex((l) => l.idLavagem === id);
+    const indice = this.indiceDe(idVeiculo, id);
     if (indice === -1) {
       throw new MockLavagemError(`Lavagem ${id} não encontrada.`);
     }

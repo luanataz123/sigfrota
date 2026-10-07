@@ -42,9 +42,9 @@ Códigos de saída: `0` sucesso; `1` erro de execução ou da AWS; `2` erro de u
 1. Configure o perfil, uma vez:
 
    ```
-   aws configure --profile hackathon          # chave de acesso
-   aws configure sso --profile hackathon      # ou IAM Identity Center
-   aws sso login --profile hackathon          # quando o login SSO expirar
+   aws configure --profile hackaton          # chave de acesso
+   aws configure sso --profile hackaton      # ou IAM Identity Center
+   aws sso login --profile hackaton          # quando o login SSO expirar
    ```
 
 2. Valide sem tocar na AWS:
@@ -58,15 +58,15 @@ Códigos de saída: `0` sucesso; `1` erro de execução ou da AWS; `2` erro de u
 3. Carregue:
 
    ```
-   node data/carga/carregar-dynamodb.mjs --tabela sigfrota-lavagem --perfil hackathon --regiao us-east-1
+   node data/carga/carregar-dynamodb.mjs --tabela sigfrota-lavagem --perfil hackaton --regiao us-east-1
    ```
 
-   Se a IaC ainda não criou a tabela, acrescente `--criar-tabela`. É só um atalho para começar: depois que o CDK/SAM criar a tabela, ela é a fonte da verdade (nome, chaves, criptografia, backup) e o script não deve mais criá-la.
+   A tabela `sigfrota-lavagem` é criada pela stack `SigfrotaBase` do CDK (`infra/`), que é a fonte da verdade (nome, chaves, criptografia, backup). **Não use `--criar-tabela`** depois do deploy da infra: uma tabela criada pelo script faria o `cdk deploy` falhar com "already exists". O atalho só serve para testar a carga numa conta sem a infra.
 
 4. Confira no console do DynamoDB (Tabelas → `sigfrota-lavagem` → Explorar itens) ou pela CLI:
 
    ```
-   aws dynamodb scan --table-name sigfrota-lavagem --select COUNT --profile hackathon --region us-east-1
+   aws dynamodb scan --table-name sigfrota-lavagem --select COUNT --profile hackaton --region us-east-1
    ```
 
    O `Count` deve ser 281 numa tabela que só tem o demo. No console, uma consulta com `PK = CATALOGO` deve trazer 27 itens (18 veículos, 3 tipos, 6 postos) e `PK = VEICULO#101` as lavagens desse veículo.
@@ -74,14 +74,14 @@ Códigos de saída: `0` sucesso; `1` erro de execução ou da AWS; `2` erro de u
 5. Para recomeçar do zero (destrutivo, apaga tudo):
 
    ```
-   node data/carga/carregar-dynamodb.mjs --tabela sigfrota-lavagem --perfil hackathon --limpar --confirmar sigfrota-lavagem
+   node data/carga/carregar-dynamodb.mjs --tabela sigfrota-lavagem --perfil hackaton --limpar --confirmar sigfrota-lavagem
    ```
 
 Com a variável de ambiente no lugar de `--tabela`:
 
 ```
 $env:TABELA_LAVAGEM = 'sigfrota-lavagem'
-npm run carregar --prefix data/carga -- --perfil hackathon --dry-run
+npm run carregar --prefix data/carga -- --perfil hackaton --dry-run
 ```
 
 ## Como a carga funciona

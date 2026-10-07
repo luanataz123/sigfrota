@@ -13,21 +13,21 @@
 // `() => sessao.token` e `() => sessao.logout()` aqui via `criarLavagemClient`.
 //
 // -----------------------------------------------------------------------------
-// Contrato HTTP assumido (REST sobre `baseUrl` = VITE_API_BASE_URL, Req. 11.1)
+// Contrato HTTP (REST sobre `baseUrl` = VITE_API_URL, Req. 11.1), implementado
+// por `services/api` (Lambdas) e registrado em `infra/lib/stacks/api-stack.ts`:
 //
-//   GET    /veiculos/{id}/lavagens   → Lavagem[]       (R19/R20)
-//   GET    /veiculos/{id}            → Veiculo          (R16, kmAtual read-only)
-//   GET    /lavagens/{id}            → Lavagem          (R21, edição)
-//   GET    /tipos-lavagem            → TipoLavagem[]    (Req. 4.5)
-//   GET    /postos                   → Posto[]          (Req. 6.6)
-//   POST   /lavagens                 → Lavagem          (R17, inclusão)
-//   PUT    /lavagens/{id}            → Lavagem          (R17, edição)
-//   DELETE /lavagens/{id}            → 204 No Content   (R17, exclusão)
+//   GET    /veiculos/{idVeiculo}                        → Veiculo        (R16)
+//   GET    /tipos-lavagem                               → TipoLavagem[]  (Req. 4.5)
+//   GET    /postos                                      → Posto[]        (Req. 6.6)
+//   GET    /veiculos/{idVeiculo}/lavagens               → Lavagem[]      (R19/R20)
+//   GET    /veiculos/{idVeiculo}/lavagens/{idLavagem}   → Lavagem        (R21)
+//   POST   /veiculos/{idVeiculo}/lavagens               → 201 Lavagem    (R17)
+//   PUT    /veiculos/{idVeiculo}/lavagens/{idLavagem}   → Lavagem        (R17)
+//   DELETE /veiculos/{idVeiculo}/lavagens/{idLavagem}   → 204            (R17)
 //
-// Todos os corpos trafegam em `application/json`. A spec de backend
-// `api-lavagens` ainda não existe no repositório; estes caminhos/métodos são o
-// contrato assumido por este frontend. Quando a spec de backend existir, basta
-// alinhar nomes de rota/campos aqui (os tipos vivem em `./types`).
+// Corpos em `application/json`. Erros de validação: 400
+// `{ mensagem, erros: { campo: mensagem } }`, com as mesmas chaves e mensagens
+// do `@sigfrota/dominio`; 404 `{ mensagem }`; 401 vem do API Gateway.
 // -----------------------------------------------------------------------------
 
 import type { LavagemClient } from './LavagemClient';
@@ -46,7 +46,7 @@ export class HttpLavagemError extends Error {
 }
 
 export interface HttpLavagemClientOptions {
-  /** Base URL da API (ex.: `import.meta.env.VITE_API_BASE_URL`). Req. 11.1. */
+  /** Base URL da API (ex.: `import.meta.env.VITE_API_URL`). Req. 11.1. */
   baseUrl: string;
   /**
    * Fornece o JWT da sessão atual, ou `null`/`undefined` quando não há sessão.
@@ -143,9 +143,9 @@ export class HttpLavagemClient implements LavagemClient {
     return this.requisicao<Veiculo>(`/veiculos/${idVeiculo}`);
   }
 
-  async obterLavagem(id: number): Promise<Lavagem> {
+  async obterLavagem(idVeiculo: number, id: number): Promise<Lavagem> {
     // R21 (edição)
-    return this.requisicao<Lavagem>(`/lavagens/${id}`);
+    return this.requisicao<Lavagem>(`/veiculos/${idVeiculo}/lavagens/${id}`);
   }
 
   async listarTipos(): Promise<TipoLavagem[]> {
@@ -161,23 +161,23 @@ export class HttpLavagemClient implements LavagemClient {
   // --- mutações --------------------------------------------------------------
 
   async criarLavagem(dados: Lavagem): Promise<Lavagem> {
-    // R17 (POST)
-    return this.requisicao<Lavagem>(`/lavagens`, {
+    // R17 (POST): a lavagem é criada sob o veículo do payload (R02).
+    return this.requisicao<Lavagem>(`/veiculos/${dados.idVeiculo}/lavagens`, {
       method: 'POST',
       body: JSON.stringify(dados),
     });
   }
 
-  async atualizarLavagem(id: number, dados: Lavagem): Promise<Lavagem> {
+  async atualizarLavagem(idVeiculo: number, id: number, dados: Lavagem): Promise<Lavagem> {
     // R17 (PUT): substituição completa do recurso.
-    return this.requisicao<Lavagem>(`/lavagens/${id}`, {
+    return this.requisicao<Lavagem>(`/veiculos/${idVeiculo}/lavagens/${id}`, {
       method: 'PUT',
       body: JSON.stringify(dados),
     });
   }
 
-  async excluirLavagem(id: number): Promise<void> {
+  async excluirLavagem(idVeiculo: number, id: number): Promise<void> {
     // R17 (DELETE)
-    await this.requisicao<void>(`/lavagens/${id}`, { method: 'DELETE' });
+    await this.requisicao<void>(`/veiculos/${idVeiculo}/lavagens/${id}`, { method: 'DELETE' });
   }
 }

@@ -76,6 +76,8 @@ if (faltando.length > 0) {
 
 const conteudo = [
   '# Gerado por infra/scripts/gerar-env-web.mjs. Não edite à mão nem versione.',
+  // Com a stack implantada, o front usa a API e o login Cognito (não os mocks).
+  'VITE_USE_MOCK=false',
   `VITE_API_URL=${outputs.ApiUrl}`,
   `VITE_REGIAO=${REGIAO}`,
   `VITE_USER_POOL_ID=${outputs.UserPoolId}`,

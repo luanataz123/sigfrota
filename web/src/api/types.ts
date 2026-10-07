@@ -21,6 +21,7 @@ export interface Lavagem {
   idLavagem?: number;        // ausente em inclusão (R01 no backend)
   idVeiculo: number;         // R02
   idTipoLavagem: number;     // R02, R05
+  dsTipoLavagem?: string;    // R20: devolvido pela API (desnormalizado); ignorado no envio
   dtLavagem: string;         // ISO YYYY-MM-DD (R15)
   kmLavagem: number;         // R02, R04
   propriaUnidade: SimNao;    // R09 (default 'S')

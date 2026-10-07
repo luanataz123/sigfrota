@@ -213,7 +213,7 @@ function FormularioEdicao({
   // Carrega a lavagem a editar (R21). Usa o client diretamente via useQuery.
   const consulta = useQuery<Lavagem, Error>({
     queryKey: lavagemQueryKey(idLavagem),
-    queryFn: () => client.obterLavagem(idLavagem),
+    queryFn: () => client.obterLavagem(idVeiculo, idLavagem),
   });
 
   if (consulta.isPending) {

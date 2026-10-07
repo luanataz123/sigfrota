@@ -65,26 +65,32 @@ describe('MockLavagemClient', () => {
   it('R21: obterLavagem retorna a lavagem pelo id', async () => {
     const client = criarClient();
     const criada = await client.criarLavagem(lavagemBase);
-    const obtida = await client.obterLavagem(criada.idLavagem!);
+    const obtida = await client.obterLavagem(101, criada.idLavagem!);
     expect(obtida.idLavagem).toBe(criada.idLavagem);
     expect(obtida.idVeiculo).toBe(101);
+  });
+
+  it('R21: obterLavagem com veículo diferente não encontra a lavagem', async () => {
+    const client = criarClient();
+    const criada = await client.criarLavagem(lavagemBase);
+    await expect(client.obterLavagem(102, criada.idLavagem!)).rejects.toThrow();
   });
 
   it('R17/R23: atualizarLavagem reflete na listagem seguinte', async () => {
     const client = criarClient();
     const criada = await client.criarLavagem(lavagemBase);
-    await client.atualizarLavagem(criada.idLavagem!, {
+    await client.atualizarLavagem(101, criada.idLavagem!, {
       ...lavagemBase,
       kmLavagem: 51234,
     });
-    const obtida = await client.obterLavagem(criada.idLavagem!);
+    const obtida = await client.obterLavagem(101, criada.idLavagem!);
     expect(obtida.kmLavagem).toBe(51234);
   });
 
   it('R17/R23: excluirLavagem remove da listagem seguinte', async () => {
     const client = criarClient();
     const criada = await client.criarLavagem(lavagemBase);
-    await client.excluirLavagem(criada.idLavagem!);
+    await client.excluirLavagem(101, criada.idLavagem!);
     const depois = await client.listarLavagens(101);
     expect(depois.some((l) => l.idLavagem === criada.idLavagem)).toBe(false);
   });

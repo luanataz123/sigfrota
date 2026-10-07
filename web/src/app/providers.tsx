@@ -19,7 +19,7 @@ import { useMemo, type ReactNode } from 'react';
 import { BrowserRouter, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, type AuthAdapter, type Sessao } from '../auth/AuthProvider';
-import { MockAuthAdapter } from '../auth/MockAuthAdapter';
+import { criarAuthAdapter } from '../auth/authAdapterFactory';
 import { useAuth } from '../auth/useAuth';
 import { criarHandler401 } from '../auth/handler401';
 import { criarLavagemClient } from '../api/clientFactory';
@@ -70,8 +70,9 @@ function ConexaoLavagemClient({ children }: { children: ReactNode }) {
 export interface AppProvidersProps {
   children: ReactNode;
   /**
-   * Adapter de autenticação. Default: `MockAuthAdapter` (MVP). Injetável para
-   * testes e para a troca por um adapter Cognito real (spec `infra-base`).
+   * Adapter de autenticação. Default: `criarAuthAdapter()` — `MockAuthAdapter`
+   * com VITE_USE_MOCK=true, `CognitoAuthAdapter` com a API real. Injetável
+   * para testes.
    */
   authAdapter?: AuthAdapter;
   /** Sessão inicial opcional (útil em testes para montar já autenticado). */
@@ -92,7 +93,8 @@ export function AppProviders({
   queryClient,
 }: AppProvidersProps) {
   // Instâncias estáveis por montagem (evita recriar entre renders).
-  const adapter = useMemo(() => authAdapter ?? new MockAuthAdapter(), [authAdapter]);
+  // Mock ou Cognito conforme VITE_USE_MOCK (ver auth/authAdapterFactory.ts).
+  const adapter = useMemo(() => authAdapter ?? criarAuthAdapter(), [authAdapter]);
   const qc = useMemo(() => queryClient ?? criarQueryClient(), [queryClient]);
 
   return (

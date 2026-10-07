@@ -173,7 +173,8 @@ describe('LavagemFormPage — modo edição (Req. 3.3/3.4 / R21)', () => {
 
     // Chamou atualizar (PUT) com o id da rota e o novo km (R17/Req. 8.2).
     expect(spyAtualizar).toHaveBeenCalledTimes(1);
-    const [idArg, dadosArg] = spyAtualizar.mock.calls[0];
+    const [idVeiculoArg, idArg, dadosArg] = spyAtualizar.mock.calls[0];
+    expect(idVeiculoArg).toBe(101);
     expect(idArg).toBe(3397);
     expect(dadosArg).toMatchObject({
       idVeiculo: 101,
@@ -412,7 +413,7 @@ describe('LavagemFormPage — exclusão (Req. 9.1–9.5 / R17/R18)', () => {
 
     // Chamou excluir (DELETE) com o id da rota (R17).
     expect(spyExcluir).toHaveBeenCalledTimes(1);
-    expect(spyExcluir).toHaveBeenCalledWith(3397);
+    expect(spyExcluir).toHaveBeenCalledWith(101, 3397);
   });
 
   it('Req. 9.4: cancelar fecha o diálogo e NÃO exclui', async () => {

@@ -73,12 +73,12 @@ export function useLavagemMutations(idVeiculo: number): LavagemMutations {
 
   const atualizar = useMutation<Lavagem, Error, AtualizarLavagemArgs>({
     mutationFn: ({ id, dados }: AtualizarLavagemArgs) =>
-      client.atualizarLavagem(id, dados), // R17 (PUT)
+      client.atualizarLavagem(idVeiculo, id, dados), // R17 (PUT)
     onSuccess: invalidarLavagens, // R23/Req. 8.5
   });
 
   const excluir = useMutation<void, Error, number>({
-    mutationFn: (id: number) => client.excluirLavagem(id), // R17 (DELETE)
+    mutationFn: (id: number) => client.excluirLavagem(idVeiculo, id), // R17 (DELETE)
     onSuccess: invalidarLavagens, // R23/Req. 8.5
   });
 
