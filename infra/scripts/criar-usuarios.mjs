@@ -2,7 +2,7 @@
 // Cria (ou atualiza) os usuários de teste do SIG Frota no Cognito: um atendente e um gestor.
 //
 // Uso: npm run usuarios -w infra
-// Profile AWS: lido de AWS_PROFILE; se ausente, usa "hackaton" (regra do workspace).
+// Profile AWS: sempre "hackaton" (regra do workspace). AWS_PROFILE e chaves em variáveis de ambiente são ignorados.
 // Região: us-east-1 (mesma da stack base).
 //
 // Segurança e LGPD:
@@ -19,9 +19,9 @@ import {
   AdminAddUserToGroupCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 
-// Define o profile antes de criar os clientes do SDK, que leem AWS_PROFILE na resolução de credenciais.
-process.env.AWS_PROFILE = process.env.AWS_PROFILE ?? 'hackaton';
-
+// Profile fixo: passado explicitamente aos clientes, tem precedência sobre AWS_PROFILE
+// e faz o SDK ignorar AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY do ambiente.
+const PROFILE = 'hackaton';
 const REGIAO = 'us-east-1';
 const NOME_STACK = 'SigfrotaBase';
 const PERFIS = [
@@ -125,7 +125,7 @@ function ehErroDeCredencial(erro) {
 
 /** Lê o ID do User Pool nos outputs da stack base. */
 async function lerUserPoolId() {
-  const cfn = new CloudFormationClient({ region: REGIAO });
+  const cfn = new CloudFormationClient({ region: REGIAO, profile: PROFILE });
   let resposta;
   try {
     resposta = await cfn.send(new DescribeStacksCommand({ StackName: NOME_STACK }));
@@ -189,7 +189,7 @@ async function provisionarUsuario(cognito, userPoolId, { email, senha, grupo }) 
 // ---------------------------------------------------------------------------
 
 async function principal() {
-  console.log(`Profile AWS: ${process.env.AWS_PROFILE} | Região: ${REGIAO}`);
+  console.log(`Profile AWS: ${PROFILE} | Região: ${REGIAO}`);
   const userPoolId = await lerUserPoolId();
   console.log(`User Pool: ${userPoolId}\n`);
 
@@ -205,7 +205,7 @@ async function principal() {
   }
   rl.close();
 
-  const cognito = new CognitoIdentityProviderClient({ region: REGIAO });
+  const cognito = new CognitoIdentityProviderClient({ region: REGIAO, profile: PROFILE });
   for (const usuario of usuarios) {
     console.log(`Provisionando ${usuario.grupo}...`);
     await provisionarUsuario(cognito, userPoolId, usuario);
@@ -217,7 +217,7 @@ principal().catch((erro) => {
   rl.close();
   if (ehErroDeCredencial(erro)) {
     console.error(
-      `Credenciais AWS inválidas ou expiradas para o profile "${process.env.AWS_PROFILE}". ` +
+      `Credenciais AWS inválidas ou expiradas para o profile "${PROFILE}". ` +
         'Renove as credenciais temporárias e confira com "aws sts get-caller-identity --profile hackaton".',
     );
   } else if (erro?.name === 'InvalidPasswordException') {
