@@ -431,6 +431,11 @@
         "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
         "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
         "timestamp": 1791390033730
+      },
+      {
+        "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
+        "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
+        "timestamp": 1791390338486
       }
     ],
     "9. Testes de componente espelhando o gabarito": [
@@ -438,6 +443,16 @@
         "executionId": "44759f85-1488-4e28-a163-1ddd495dd2ca",
         "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
         "timestamp": 1791382110610
+      },
+      {
+        "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
+        "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
+        "timestamp": 1791390346417
+      },
+      {
+        "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
+        "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
+        "timestamp": 1791390888191
       }
     ],
     "10. Acessibilidade, responsividade e segurança no cliente": [
@@ -445,6 +460,16 @@
         "executionId": "44759f85-1488-4e28-a163-1ddd495dd2ca",
         "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
         "timestamp": 1791382111037
+      },
+      {
+        "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
+        "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
+        "timestamp": 1791390893678
+      },
+      {
+        "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
+        "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
+        "timestamp": 1791391628239
       }
     ],
     "11. Integração com a API real": [
@@ -452,6 +477,16 @@
         "executionId": "44759f85-1488-4e28-a163-1ddd495dd2ca",
         "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
         "timestamp": 1791382111380
+      },
+      {
+        "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
+        "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
+        "timestamp": 1791391633940
+      },
+      {
+        "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
+        "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
+        "timestamp": 1791392025787
       }
     ],
     "12. Build e verificação final": [
@@ -459,6 +494,16 @@
         "executionId": "44759f85-1488-4e28-a163-1ddd495dd2ca",
         "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
         "timestamp": 1791382111720
+      },
+      {
+        "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
+        "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
+        "timestamp": 1791392031707
+      },
+      {
+        "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
+        "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
+        "timestamp": 1791392283652
       }
     ],
     "2. Tipos do contrato e camada de client": [
@@ -501,6 +546,13 @@
         "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
         "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
         "timestamp": 1791389116083
+      }
+    ],
+    "8. Mutações: incluir, alterar, excluir": [
+      {
+        "executionId": "065a8265-332d-4dd5-8b5b-5e4b110b42b9",
+        "chatSessionId": "sess_7f07375e-705b-4d76-8dd9-5d5ddb55e8f0",
+        "timestamp": 1791390338755
       }
     ]
   }

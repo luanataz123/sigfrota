@@ -726,3 +726,64 @@ describe('LavagemForm — data no envio (Req. 7.1 / R15 e Req. 7.2)', () => {
     expect(onSubmit.mock.calls[0][0].dtLavagem).toBe('2024-02-29');
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tarefa 10 — Segurança no cliente (Req. 10.6)
+//
+// Garante que dados sensíveis (notadamente o CNPJ do posto, no ramo NÃO
+// conveniado) NÃO são escritos no console do navegador ao preencher e submeter
+// uma lavagem. Instalamos spies em todos os canais do console e, após um fluxo
+// completo não conveniado com CNPJ, afirmamos que nada foi logado. Se algum log
+// escapasse com o payload/CNPJ, o teste capturaria a string e falharia.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('LavagemForm — segurança no cliente (Req. 10.6)', () => {
+  it('não escreve CNPJ nem dados do formulário no console ao submeter (não conveniado)', async () => {
+    const canais = ['log', 'error', 'warn', 'debug', 'info'] as const;
+    const spies = canais.map((canal) =>
+      vi.spyOn(console, canal).mockImplementation(() => {}),
+    );
+
+    try {
+      const { onSubmit } = renderForm();
+
+      await preencherObrigatoriosBase();
+      alternarUnidade('N'); // externa
+
+      const valor = await screen.findByLabelText(/valor/i);
+      fireEvent.change(valor, { target: { value: '75,00' } });
+      fireEvent.blur(valor);
+
+      alternarConveniado('N'); // não conveniado → exige descrição + CNPJ
+      const descricao = await screen.findByLabelText(/descrição do posto/i);
+      fireEvent.change(descricao, { target: { value: 'Lava-Jato do Zé' } });
+      const CNPJ_SENSIVEL = '12.345.678/0001-90';
+      fireEvent.change(screen.getByLabelText(/cnpj do posto/i), {
+        target: { value: CNPJ_SENSIVEL },
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: /salvar/i }));
+
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+      // O payload chega ao onSubmit com o CNPJ (ele faz parte do contrato),
+      // confirmando que o fluxo exercitado realmente carrega o dado sensível.
+      expect(onSubmit.mock.calls[0][0].cnpjPosto).toBe(CNPJ_SENSIVEL);
+
+      // Núcleo do Req. 10.6: NENHUM canal do console foi usado durante o fluxo.
+      for (const spy of spies) {
+        expect(spy).not.toHaveBeenCalled();
+      }
+
+      // Reforço: o CNPJ não aparece em NENHUM argumento logado (defesa extra
+      // caso um log genérico sem PII fosse adicionado no futuro).
+      const todosArgs = spies
+        .flatMap((spy) => spy.mock.calls)
+        .flat()
+        .map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg)))
+        .join(' ');
+      expect(todosArgs).not.toContain(CNPJ_SENSIVEL);
+    } finally {
+      spies.forEach((spy) => spy.mockRestore());
+    }
+  });
+});

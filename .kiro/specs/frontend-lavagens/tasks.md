@@ -90,7 +90,7 @@ ver resultado cedo com o `MockLavagemClient`, integrando a API real só no fim.
 - [x] 7.5 Montagem do payload por ramo (não enviar campos ocultos)
   - _Requisitos: 8.3_ · _Regras: R10, R13, R14_
 
-- [ ] 8. Mutações: incluir, alterar, excluir
+- [x] 8. Mutações: incluir, alterar, excluir
 - [x] 8.1 `useLavagemMutations` (create/update/delete) + invalidação de query
   - Invalida `['lavagens', idVeiculo]` no sucesso (resultado na tela).
   - _Requisitos: 8.1, 8.2, 8.5_ · _Regras: R17, R23_
@@ -99,29 +99,29 @@ ver resultado cedo com o `MockLavagemClient`, integrando a API real só no fim.
   - _Requisitos: 3.2, 3.3, 3.4, 8.4_ · _Regras: R18, R21, R22_
 - [x] 8.3 Estados de salvamento (desabilitar botão, erro mantém dados)
   - _Requisitos: 8.6, 8.7_
-- [-] 8.4 `ConfirmDeleteDialog` + exclusão
+- [x] 8.4 `ConfirmDeleteDialog` + exclusão
   - Confirmação, sucesso remove da lista e volta com mensagem, cancelar não exclui.
   - _Requisitos: 9.1, 9.2, 9.3, 9.4, 9.5_ · _Regras: R17, R18_
 
-- [ ] 9. Testes de componente espelhando o gabarito
+- [x] 9. Testes de componente espelhando o gabarito
   - Casos felizes (interna, conveniado, não conveniado) e de erro (km zero, valor
     zero/ausente externo, conveniado sem posto, não conveniado sem CNPJ, data
     inválida), listagem por veículo e resultado na tela.
   - Nome de cada teste cita a Rxx (rastreabilidade).
   - _Requisitos: 2.1–2.3, 5, 6, 7, 8.5, 9_ · _Regras: R03, R04, R09–R15, R19, R23_
 
-- [ ] 10. Acessibilidade, responsividade e segurança no cliente
+- [x] 10. Acessibilidade, responsividade e segurança no cliente
   - Revisar labels/aria, foco em diálogos, navegação por teclado; layout
     responsivo desktop/tablet; garantir que CNPJ e dados sensíveis não vão para
     o console.
   - _Requisitos: 10.2, 10.3, 10.4, 10.5, 10.6_
 
-- [ ] 11. Integração com a API real
+- [x] 11. Integração com a API real
   - Completar `HttpLavagemClient` (JWT, 401 → logout) e validar o fluxo ponta a
     ponta contra o contrato de `api-lavagens`; alternar `VITE_USE_MOCK=false`.
   - _Requisitos: 1.3, 1.4, 11.1, 11.2_ · _Regras: R17, R19_
 
-- [ ] 12. Build e verificação final
+- [x] 12. Build e verificação final
   - Garantir `npm run build` e `npm run test` verdes; checar demo do veículo 101
     (incluir lavagem → aparece no painel) com mock e com API.
   - _Requisitos: 8.5, 11.3_ · _Regras: R19, R23_

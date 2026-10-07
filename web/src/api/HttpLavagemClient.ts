@@ -1,29 +1,34 @@
 // api/HttpLavagemClient.ts
 //
-// ESQUELETO da implementação HTTP do contrato `LavagemClient`.
+// Implementação HTTP do contrato `LavagemClient` contra a API `api-lavagens`.
 //
-// Esta classe estabelece a estrutura base para falar com a API real
-// `api-lavagens`:
+// Responsabilidades:
 //  - Injeta o JWT da sessão no header `Authorization` de cada chamada (Req. 1.3).
 //  - Ao receber 401, dispara um callback de encerramento de sessão (Req. 1.4),
-//    sem travar a aplicação.
+//    sem travar a aplicação, e propaga um `HttpLavagemError`.
+//  - Serializa/parseia JSON e expõe o corpo de erros 4xx/5xx para a UI.
 //
 // O token e o callback de 401 são INJETÁVEIS (via construtor) para não acoplar
-// esta camada ao AuthProvider — que ainda não existe (será criado na tarefa 3).
-// A tarefa 3 passará `() => sessao.token` e `() => sessao.logout()` aqui.
+// esta camada ao AuthProvider. O `providers.tsx` (tarefa 3.3) liga
+// `() => sessao.token` e `() => sessao.logout()` aqui via `criarLavagemClient`.
 //
-// =====================================================================
-// TAREFA 11 (Integração com a API real) — o que falta completar aqui:
-//  - Validar o mapeamento request/response contra o contrato real de
-//    `api-lavagens` (nomes de campos, envelopes, códigos de status).
-//  - Confirmar as rotas/métodos exatos (ex.: PUT vs PATCH em atualizar).
-//  - Tratar erros de domínio/validação do servidor (R03–R15) e mapear para a
-//    UI, além do 401 já previsto.
-//  - Testes de integração ponta a ponta com `VITE_USE_MOCK=false`.
-// Enquanto a tarefa 11 não roda, a implementação padrão é o MockLavagemClient
-// (ver clientFactory.ts); por isso os métodos abaixo já montam a chamada HTTP
-// mas o contrato real só é garantido após a tarefa 11.
-// =====================================================================
+// -----------------------------------------------------------------------------
+// Contrato HTTP assumido (REST sobre `baseUrl` = VITE_API_BASE_URL, Req. 11.1)
+//
+//   GET    /veiculos/{id}/lavagens   → Lavagem[]       (R19/R20)
+//   GET    /veiculos/{id}            → Veiculo          (R16, kmAtual read-only)
+//   GET    /lavagens/{id}            → Lavagem          (R21, edição)
+//   GET    /tipos-lavagem            → TipoLavagem[]    (Req. 4.5)
+//   GET    /postos                   → Posto[]          (Req. 6.6)
+//   POST   /lavagens                 → Lavagem          (R17, inclusão)
+//   PUT    /lavagens/{id}            → Lavagem          (R17, edição)
+//   DELETE /lavagens/{id}            → 204 No Content   (R17, exclusão)
+//
+// Todos os corpos trafegam em `application/json`. A spec de backend
+// `api-lavagens` ainda não existe no repositório; estes caminhos/métodos são o
+// contrato assumido por este frontend. Quando a spec de backend existir, basta
+// alinhar nomes de rota/campos aqui (os tipos vivem em `./types`).
+// -----------------------------------------------------------------------------
 
 import type { LavagemClient } from './LavagemClient';
 import type { Lavagem, Posto, TipoLavagem, Veiculo } from './types';
@@ -76,8 +81,9 @@ export class HttpLavagemClient implements LavagemClient {
   /**
    * Executa uma chamada HTTP injetando o JWT (Req. 1.3) e tratando 401 (Req. 1.4).
    *
-   * TAREFA 11: o parsing do corpo e o mapeamento de erros de validação do
-   * servidor ainda serão ajustados ao contrato real.
+   * Erros de validação do servidor (4xx com corpo, R03–R15) são propagados como
+   * `HttpLavagemError` com `status` e `corpo`, para a UI exibir sem reinterpretar
+   * campo a campo.
    */
   private async requisicao<T>(caminho: string, init: RequestInit = {}): Promise<T> {
     const token = this.obterToken();
@@ -104,7 +110,7 @@ export class HttpLavagemClient implements LavagemClient {
     }
 
     if (!resposta.ok) {
-      // TAREFA 11: mapear erros de domínio/validação (R03–R15) ao formato da UI.
+      // Erros de domínio/validação (R03–R15): expõe o corpo bruto à UI.
       let corpo: unknown;
       try {
         corpo = await resposta.json();
@@ -126,7 +132,6 @@ export class HttpLavagemClient implements LavagemClient {
   }
 
   // --- leituras --------------------------------------------------------------
-  // TAREFA 11: confirmar rotas/formatos exatos contra o contrato de api-lavagens.
 
   async listarLavagens(idVeiculo: number): Promise<Lavagem[]> {
     // R19/R20
@@ -164,7 +169,7 @@ export class HttpLavagemClient implements LavagemClient {
   }
 
   async atualizarLavagem(id: number, dados: Lavagem): Promise<Lavagem> {
-    // R17 (PUT) — TAREFA 11: confirmar PUT vs PATCH no contrato.
+    // R17 (PUT): substituição completa do recurso.
     return this.requisicao<Lavagem>(`/lavagens/${id}`, {
       method: 'PUT',
       body: JSON.stringify(dados),

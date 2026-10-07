@@ -15,7 +15,7 @@
 // mock de regra.
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -329,5 +329,131 @@ describe('LavagemFormPage — estados de salvamento (Req. 8.6/8.7)', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /salvar/i })).toBeEnabled();
     });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tarefa 8.4 — ConfirmDeleteDialog + exclusão (Req. 9.1–9.5 / R17/R18)
+//
+//  - Req. 9.1: a ação "Excluir" só aparece no modo EDIÇÃO (não na inclusão).
+//  - Req. 9.2: acionar "Excluir" abre o diálogo de confirmação (não exclui ainda).
+//  - Req. 9.3: confirmar exclui (client.excluirLavagem com o id da rota) e
+//    navega de volta a /veiculos/:idVeiculo (sentinela de destino).
+//  - Req. 9.4: cancelar fecha o diálogo e NÃO exclui.
+//  - Req. 9.5: falha na exclusão exibe toast de erro e NÃO navega.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Client cujo `excluirLavagem` sempre rejeita (falha de exclusão — Req. 9.5). */
+class ClientExcluirComErro extends MockLavagemClient {
+  constructor() {
+    super({ latenciaMs: 0 });
+  }
+
+  override excluirLavagem(): Promise<void> {
+    return Promise.reject(new Error('Falha ao excluir.'));
+  }
+}
+
+/** Aguarda o carregamento da lavagem 3397 (campo data preenchido). */
+async function aguardarCarregarEdicao() {
+  const campoData = (await screen.findByLabelText(
+    /data da lavagem/i,
+  )) as HTMLInputElement;
+  await waitFor(() => expect(campoData.value).toBe('2026-09-01'));
+}
+
+describe('LavagemFormPage — exclusão (Req. 9.1–9.5 / R17/R18)', () => {
+  it('Req. 9.1: o botão "Excluir" NÃO aparece no modo inclusão', async () => {
+    const client = new MockLavagemClient({ latenciaMs: 0 });
+    montar('/veiculos/101/lavagens/nova', client);
+
+    await screen.findByRole('form', { name: /formulário de lavagem/i });
+    expect(
+      screen.queryByRole('button', { name: /excluir/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('Req. 9.1/9.2: na edição, "Excluir" aparece e abre o diálogo de confirmação', async () => {
+    const client = new MockLavagemClient({ latenciaMs: 0 });
+    const spyExcluir = vi.spyOn(client, 'excluirLavagem');
+    montar('/veiculos/101/lavagens/3397', client);
+
+    await aguardarCarregarEdicao();
+
+    const botaoExcluir = screen.getByRole('button', { name: /excluir/i });
+    expect(botaoExcluir).toBeInTheDocument();
+
+    // Antes de clicar, o diálogo não existe.
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+
+    fireEvent.click(botaoExcluir);
+
+    // Abriu o diálogo (Req. 9.2) e NÃO excluiu ainda.
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    expect(spyExcluir).not.toHaveBeenCalled();
+  });
+
+  it('Req. 9.3/R17/R18: confirmar exclui a lavagem 3397 e navega de volta ao painel', async () => {
+    const client = new MockLavagemClient({ latenciaMs: 0 });
+    const spyExcluir = vi.spyOn(client, 'excluirLavagem');
+    montar('/veiculos/101/lavagens/3397', client);
+
+    await aguardarCarregarEdicao();
+
+    fireEvent.click(screen.getByRole('button', { name: /excluir/i }));
+
+    // No diálogo, confirma (o botão destrutivo dentro do alertdialog).
+    const dialogo = screen.getByRole('alertdialog');
+    const confirmar = within(dialogo).getByRole('button', { name: /excluir/i });
+    fireEvent.click(confirmar);
+
+    // Navegou de volta ao painel (R18).
+    expect(await screen.findByTestId('destino-veiculo')).toBeInTheDocument();
+
+    // Chamou excluir (DELETE) com o id da rota (R17).
+    expect(spyExcluir).toHaveBeenCalledTimes(1);
+    expect(spyExcluir).toHaveBeenCalledWith(3397);
+  });
+
+  it('Req. 9.4: cancelar fecha o diálogo e NÃO exclui', async () => {
+    const client = new MockLavagemClient({ latenciaMs: 0 });
+    const spyExcluir = vi.spyOn(client, 'excluirLavagem');
+    montar('/veiculos/101/lavagens/3397', client);
+
+    await aguardarCarregarEdicao();
+
+    fireEvent.click(screen.getByRole('button', { name: /excluir/i }));
+
+    const dialogo = screen.getByRole('alertdialog');
+    fireEvent.click(within(dialogo).getByRole('button', { name: /cancelar/i }));
+
+    // Diálogo fechou e nada foi excluído.
+    await waitFor(() =>
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument(),
+    );
+    expect(spyExcluir).not.toHaveBeenCalled();
+
+    // Não navegou: o form segue montado.
+    expect(screen.queryByTestId('destino-veiculo')).not.toBeInTheDocument();
+  });
+
+  it('Req. 9.5: falha na exclusão exibe toast de erro e NÃO navega', async () => {
+    const client = new ClientExcluirComErro();
+    montar('/veiculos/101/lavagens/3397', client);
+
+    await aguardarCarregarEdicao();
+
+    fireEvent.click(screen.getByRole('button', { name: /excluir/i }));
+
+    const dialogo = screen.getByRole('alertdialog');
+    fireEvent.click(within(dialogo).getByRole('button', { name: /excluir/i }));
+
+    // Toast de erro (Req. 9.5 / Req. 10.1).
+    expect(
+      await screen.findByText(/não foi possível excluir a lavagem/i),
+    ).toBeInTheDocument();
+
+    // NÃO navegou: o sentinela de destino não aparece (a lavagem permanece).
+    expect(screen.queryByTestId('destino-veiculo')).not.toBeInTheDocument();
   });
 });
