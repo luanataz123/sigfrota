@@ -1,0 +1,44 @@
+[
+  {
+    "idLavagem": 3418,
+    "idVeiculo": 111,
+    "tipo": "KM_REGREDIDO",
+    "descricao": "Km 26.862 menor que os 27.387 da lavagem anterior (3405)"
+  },
+  {
+    "idLavagem": 3469,
+    "idVeiculo": 116,
+    "tipo": "VALOR_ACIMA_MEDIA",
+    "descricao": "Valor R$ 569,42 é 3,2x a média das lavagens Higienizacao interna (R$ 175,40)"
+  },
+  {
+    "idLavagem": 3483,
+    "idVeiculo": 104,
+    "tipo": "MESMO_DIA",
+    "descricao": "Segunda lavagem do veículo 104 em 2026-02-17 (a primeira é a 3482)"
+  },
+  {
+    "idLavagem": 3538,
+    "idVeiculo": 105,
+    "tipo": "MESMO_DIA",
+    "descricao": "Segunda lavagem do veículo 105 em 2026-04-24 (a primeira é a 3537)"
+  },
+  {
+    "idLavagem": 3553,
+    "idVeiculo": 113,
+    "tipo": "VALOR_ACIMA_MEDIA",
+    "descricao": "Valor R$ 142,82 é 3,4x a média das lavagens Simples (R$ 42,33)"
+  },
+  {
+    "idLavagem": 3579,
+    "idVeiculo": 108,
+    "tipo": "KM_REGREDIDO",
+    "descricao": "Km 63.825 menor que os 64.111 da lavagem anterior (3573)"
+  },
+  {
+    "idLavagem": 3612,
+    "idVeiculo": 114,
+    "tipo": "VALOR_ACIMA_MEDIA",
+    "descricao": "Valor R$ 252,46 é 3,3x a média das lavagens Completa (R$ 75,53)"
+  }
+]

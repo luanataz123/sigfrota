@@ -1,0 +1,136 @@
+[
+  {
+    "PK": "CATALOGO",
+    "SK": "POSTO#10",
+    "entityType": "POSTO",
+    "idPosto": 10,
+    "nmPosto": "Auto Posto Central (conveniado)"
+  },
+  {
+    "PK": "CATALOGO",
+    "SK": "POSTO#11",
+    "entityType": "POSTO",
+    "idPosto": 11,
+    "nmPosto": "Lava-Rapido Norte (conveniado)"
+  },
+  {
+    "PK": "CATALOGO",
+    "SK": "TIPO#1",
+    "entityType": "TIPO_LAVAGEM",
+    "idTipoLavagem": 1,
+    "dsTipoLavagem": "Simples"
+  },
+  {
+    "PK": "CATALOGO",
+    "SK": "TIPO#2",
+    "entityType": "TIPO_LAVAGEM",
+    "idTipoLavagem": 2,
+    "dsTipoLavagem": "Completa"
+  },
+  {
+    "PK": "CATALOGO",
+    "SK": "TIPO#3",
+    "entityType": "TIPO_LAVAGEM",
+    "idTipoLavagem": 3,
+    "dsTipoLavagem": "Higienizacao interna"
+  },
+  {
+    "PK": "CATALOGO",
+    "SK": "VEICULO#101",
+    "entityType": "VEICULO",
+    "idVeiculo": 101,
+    "dsVeiculo": "Fiat Cronos de placa ABC1D23",
+    "placa": "ABC1D23",
+    "marca": "Fiat",
+    "modelo": "Cronos",
+    "ano": 2022,
+    "kmAtual": 45210
+  },
+  {
+    "PK": "CATALOGO",
+    "SK": "VEICULO#102",
+    "entityType": "VEICULO",
+    "idVeiculo": 102,
+    "dsVeiculo": "VW Voyage de placa DEF2G45",
+    "placa": "DEF2G45",
+    "marca": "VW",
+    "modelo": "Voyage",
+    "ano": 2019,
+    "kmAtual": 88750
+  },
+  {
+    "PK": "CATALOGO",
+    "SK": "VEICULO#103",
+    "entityType": "VEICULO",
+    "idVeiculo": 103,
+    "dsVeiculo": "Chevrolet Onix de placa HIJ3K67",
+    "placa": "HIJ3K67",
+    "marca": "Chevrolet",
+    "modelo": "Onix",
+    "ano": 2025,
+    "kmAtual": 12030
+  },
+  {
+    "PK": "CONTADOR",
+    "SK": "LAVAGEM",
+    "entityType": "CONTADOR",
+    "ultimoId": 3399
+  },
+  {
+    "PK": "VEICULO#101",
+    "SK": "LAVAGEM#3397",
+    "entityType": "LAVAGEM",
+    "idLavagem": 3397,
+    "idTipoLavagem": 2,
+    "dsTipoLavagem": "Completa",
+    "dtLavagem": "2026-09-01",
+    "kmLavagem": 45000,
+    "vlLavagem": 60,
+    "idVeiculo": 101,
+    "dsPosto": null,
+    "cnpjPosto": null,
+    "idPosto": 10,
+    "idPessoaCadastrador": 9001,
+    "dtCadastro": "2026-09-01",
+    "propriaUnidade": false,
+    "postoConveniado": true
+  },
+  {
+    "PK": "VEICULO#102",
+    "SK": "LAVAGEM#3398",
+    "entityType": "LAVAGEM",
+    "idLavagem": 3398,
+    "idTipoLavagem": 1,
+    "dsTipoLavagem": "Simples",
+    "dtLavagem": "2026-09-03",
+    "kmLavagem": 88800,
+    "vlLavagem": 35,
+    "idVeiculo": 102,
+    "dsPosto": "Lava-Jato do Ze",
+    "cnpjPosto": "12.345.678/0001-90",
+    "idPosto": null,
+    "idPessoaCadastrador": 9001,
+    "dtCadastro": "2026-09-03",
+    "propriaUnidade": false,
+    "postoConveniado": false
+  },
+  {
+    "PK": "VEICULO#103",
+    "SK": "LAVAGEM#3399",
+    "entityType": "LAVAGEM",
+    "idLavagem": 3399,
+    "idTipoLavagem": 3,
+    "dsTipoLavagem": "Higienizacao interna",
+    "dtLavagem": "2026-09-05",
+    "kmLavagem": 12050,
+    "vlLavagem": null,
+    "idVeiculo": 103,
+    "dsPosto": null,
+    "cnpjPosto": null,
+    "idPosto": null,
+    "idPessoaCadastrador": 9001,
+    "dtCadastro": "2026-09-05",
+    "propriaUnidade": true,
+    "postoConveniado": null
+  }
+]
