@@ -8,6 +8,7 @@ import type { ServicoLavagens } from './servico';
 /** Catálogo (leitura): veículo, tipos e postos. */
 export function rotasCatalogo(servico: ServicoLavagens) {
   return criarDespachante({
+    'GET /veiculos': async () => responder(200, await servico.listarVeiculos()),
     'GET /veiculos/{idVeiculo}': async (e) =>
       responder(200, await servico.obterVeiculo(inteiroDaRota(e, 'idVeiculo'))),
     'GET /tipos-lavagem': async () => responder(200, await servico.listarTipos()),

@@ -120,7 +120,7 @@ export function ConfirmDeleteDialog({
     // Fundo (overlay): clicar fora cancela (equivale a "Cancelar"). O diálogo em
     // si para a propagação para não cancelar ao clicar dentro.
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
       onMouseDown={onCancelar}
       data-testid="confirm-delete-overlay"
     >
@@ -133,7 +133,7 @@ export function ConfirmDeleteDialog({
         tabIndex={-1}
         onKeyDown={aoTeclar}
         onMouseDown={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl focus:outline-none focus:ring-2 focus:ring-slate-400"
+        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <h2
           id="confirm-delete-titulo"
@@ -149,7 +149,7 @@ export function ConfirmDeleteDialog({
           <button
             type="button"
             onClick={onCancelar}
-            className="rounded border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400"
+            className="btn-secondary"
           >
             {rotuloCancelar}
           </button>
@@ -158,7 +158,7 @@ export function ConfirmDeleteDialog({
             onClick={onConfirmar}
             disabled={confirmando}
             aria-busy={confirmando}
-            className="rounded bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-red-600"
+            className="btn bg-red-600 text-white shadow-md shadow-red-600/25 hover:bg-red-700"
           >
             {confirmando ? 'Excluindo…' : rotuloConfirmar}
           </button>

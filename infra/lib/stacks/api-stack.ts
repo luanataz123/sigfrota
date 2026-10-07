@@ -46,6 +46,7 @@ export class SigfrotaApiStack extends Stack {
         descricao: 'SIG Frota - catálogo de veículos, tipos e postos',
         acoes: ['dynamodb:GetItem', 'dynamodb:Query'],
         rotas: [
+          { metodo: 'GET', caminho: '/veiculos' },
           { metodo: 'GET', caminho: '/veiculos/{idVeiculo}' },
           { metodo: 'GET', caminho: '/tipos-lavagem' },
           { metodo: 'GET', caminho: '/postos' },

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arquitetura AWS — SIG Frota (módulo Lavagem)</title>
+  <style>
+    body { font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; margin: 0; background: #f8f9fb; color: #1e1e2f; }
+    header { background: #1e1e2f; color: #fff; padding: 20px 24px; }
+    header h1 { margin: 0; font-size: 20px; }
+    header p { margin: 4px 0 0; font-size: 13px; color: #a5b4fc; }
+    main { padding: 24px; }
+    .diagram { background: #fff; border: 1px solid #e8e8f0; border-radius: 10px; padding: 16px; overflow: auto; }
+    .mermaid { display: flex; justify-content: center; }
+    .legenda { background: #fff; border: 1px solid #e8e8f0; border-radius: 10px; padding: 12px 20px; margin-top: 16px; font-size: 14px; }
+    .legenda h2 { font-size: 15px; margin: 8px 0; }
+    footer { padding: 12px 24px 24px; font-size: 12px; color: #525266; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Arquitetura AWS — SIG Frota (módulo Lavagem)</h1>
+    <p>Versão alinhada ao código · Front React (web/) + Infra CDK · us-east-1</p>
+  </header>
+  <main>
+    <div class="diagram">
+      <pre class="mermaid">
+graph TB
+    user["Gestor / Atendente&lt;br/&gt;(navegador)"]
+
+    subgraph front["Front-end (web/ - React + Vite + Tailwind)"]
+        spa["SPA React&lt;br/&gt;LoginPage + RequireAuth&lt;br/&gt;painel de lavagens + form"]
+        clients["clientFactory&lt;br/&gt;MockLavagemClient (VITE_USE_MOCK=true)&lt;br/&gt;HttpLavagemClient (JWT Bearer, trata 401)"]
+    end
+
+    subgraph edge["Borda / Entrega (infra/constructs/front.ts)"]
+        cf["Amazon CloudFront&lt;br/&gt;HTTPS, OAC, CSP/HSTS&lt;br/&gt;SPA fallback index.html"]
+        s3web["Amazon S3 (privado)&lt;br/&gt;build do front + config.json&lt;br/&gt;BlockPublicAccess, SSE-S3"]
+    end
+
+    subgraph auth["Autenticacao (infra/constructs/autenticacao.ts)"]
+        cognito["Amazon Cognito User Pool&lt;br/&gt;self-signup desabilitado&lt;br/&gt;grupos atendente/gestor"]
+    end
+
+    subgraph api["API (infra/constructs/api.ts)"]
+        apigw["API Gateway HTTP API (v2)&lt;br/&gt;HttpJwtAuthorizer (padrao)&lt;br/&gt;GET /veiculos, /veiculos/:id/lavagens,&lt;br/&gt;/lavagens/:id, /tipos-lavagem, /postos&lt;br/&gt;POST/PUT/DELETE /lavagens"]
+    end
+
+    subgraph compute["Computacao (infra/constructs/funcao-lambda.ts)"]
+        lmbLav["AWS Lambda (NodejsFunction)&lt;br/&gt;api-lavagens: regras R01-R23&lt;br/&gt;usa packages/dominio"]
+    end
+
+    subgraph dados["Dados (infra/constructs/dados.ts)"]
+        ddb["Amazon DynamoDB&lt;br/&gt;tabela unica PK/SK&lt;br/&gt;KMS, PITR"]
+    end
+
+    subgraph obs["Config / Observabilidade (base-stack.ts)"]
+        ssm["AWS SSM Parameter Store&lt;br/&gt;/sigfrota/... (contrato de infra)&lt;br/&gt;+ CfnOutput"]
+        cw["Amazon CloudWatch Logs"]
+    end
+
+    subgraph ia["IA - PLANEJADO (specs 5/6, ainda nao no CDK)"]
+        bedrock["Amazon Bedrock&lt;br/&gt;extracao de regras / leitura de recibo"]
+        sfn["AWS Step Functions&lt;br/&gt;orquestracao"]
+        s3up["Amazon S3&lt;br/&gt;upload de recibo/SQL"]
+    end
+
+    iac["AWS CDK + cdk-nag&lt;br/&gt;us-east-1, menor privilegio"]
+
+    user --&gt;|HTTPS| cf
+    cf --&gt;|OAC| s3web
+    cf --&gt; spa
+    spa --&gt; clients
+    user --&gt;|login OIDC| cognito
+    clients --&gt;|REST + JWT| apigw
+    apigw --&gt;|valida token| cognito
+    apigw --&gt; lmbLav
+    lmbLav --&gt;|Query/GetItem/PutItem| ddb
+    lmbLav --&gt; cw
+    apigw --&gt; cw
+    iac -.provisiona.-&gt; edge
+    iac -.provisiona.-&gt; auth
+    iac -.provisiona.-&gt; api
+    iac -.provisiona.-&gt; compute
+    iac -.provisiona.-&gt; dados
+    iac -.publica.-&gt; ssm
+
+    sfn -.-&gt; bedrock
+    sfn -.-&gt; s3up
+    apigw -. futuro .-&gt; sfn
+
+    classDef planned fill:#f5f5f5,stroke:#999,stroke-dasharray:5 5,color:#555;
+    class ia,bedrock,sfn,s3up planned;
+      </pre>
+    </div>
+
+    <div class="legenda">
+      <h2>Como ler</h2>
+      <p><strong>Caixas sólidas</strong> = implementado hoje no código: front React em <code>web/</code> e infra CDK (DynamoDB, Cognito, API Gateway HTTP API com authorizer JWT, Lambda <code>api-lavagens</code>, S3 + CloudFront, SSM, cdk-nag).</p>
+      <p><strong>Bloco "IA — PLANEJADO" (tracejado/cinza)</strong> = specs 5 e 6 (extração de regras e leitura de recibo via Bedrock + Step Functions). Ainda <em>não</em> estão no CDK; o serviço <code>ia-recibo</code> hoje contém apenas fixtures/geradores de recibo.</p>
+      <p>No MVP de desenvolvimento, o front roda com <code>VITE_USE_MOCK=true</code> (dados mock locais, sem AWS). Com <code>VITE_USE_MOCK=false</code> + <code>VITE_API_BASE_URL</code>, passa a consumir a API real.</p>
+    </div>
+  </main>
+  <footer>Renderizado localmente com Mermaid (CDN). Diagrama fonte: docs/arquitetura-aws.mmd</footer>
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+</body>
+</html>

@@ -104,7 +104,7 @@ export const MoneyInput = forwardRef<HTMLInputElement, MoneyInputProps>(
         <div className="flex items-stretch">
           <span
             aria-hidden="true"
-            className="inline-flex items-center rounded-l border border-r-0 border-slate-300 bg-slate-50 px-3 text-slate-600"
+            className="inline-flex items-center rounded-l-lg border border-r-0 border-slate-300 bg-slate-100 px-3 text-sm font-semibold text-slate-600"
           >
             R$
           </span>
@@ -133,7 +133,7 @@ export const MoneyInput = forwardRef<HTMLInputElement, MoneyInputProps>(
             }}
             className={
               className ??
-              'w-full rounded-r border border-slate-300 px-3 py-2 text-slate-900 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:bg-slate-100 aria-[invalid=true]:border-red-400 aria-[invalid=true]:focus:ring-red-400'
+              'input rounded-l-none'
             }
             {...inputProps}
           />

@@ -12,6 +12,10 @@ export interface VeiculoDto {
   idVeiculo: number;
   descricao: string;
   kmAtual: number;
+  placa?: string;
+  marca?: string;
+  modelo?: string;
+  ano?: number;
 }
 
 export interface TipoLavagemDto {

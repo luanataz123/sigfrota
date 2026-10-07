@@ -25,9 +25,9 @@ export interface ToastProps {
 
 /** Classes utilitárias por severidade (borda/fundo/texto). */
 const CLASSES_SEVERIDADE: Record<ToastSeveridade, string> = {
-  sucesso: 'border-green-300 bg-green-50 text-green-800',
-  erro: 'border-red-300 bg-red-50 text-red-800',
-  info: 'border-slate-300 bg-white text-slate-800',
+  sucesso: 'border-emerald-300 bg-emerald-50 text-emerald-900 border-l-4 border-l-emerald-500',
+  erro: 'border-red-300 bg-red-50 text-red-900 border-l-4 border-l-red-500',
+  info: 'border-slate-300 bg-white text-slate-800 border-l-4 border-l-blue-500',
 };
 
 /**
@@ -38,7 +38,7 @@ export function Toast({ mensagem, severidade = 'info', onFechar }: ToastProps) {
   return (
     <div
       data-severidade={severidade}
-      className={`pointer-events-auto flex items-start gap-3 rounded border px-3 py-2 text-sm shadow-sm ${CLASSES_SEVERIDADE[severidade]}`}
+      className={`pointer-events-auto flex min-w-[18rem] items-start gap-3 rounded-xl border px-4 py-3 text-sm font-medium shadow-lg shadow-slate-900/10 ${CLASSES_SEVERIDADE[severidade]}`}
     >
       <span className="flex-1">{mensagem}</span>
       {onFechar && (

@@ -89,9 +89,14 @@ describe('useLavagens (R19/R20 — Req. 2.1, 2.2)', () => {
     const lavagens = result.current.data!;
     // Só do veículo 101 (R19 filtra por idVeiculo).
     expect(lavagens.every((l) => l.idVeiculo === 101)).toBe(true);
-    // Dados sintéticos: 101 tem duas lavagens (3400 em 2026-08-20, 3397 em 2026-09-01).
-    expect(lavagens.map((l) => l.dtLavagem)).toEqual(['2026-08-20', '2026-09-01']);
-    expect(lavagens.map((l) => l.idLavagem)).toEqual([3400, 3397]);
+    // Dados sintéticos (demo): 101 tem 11 lavagens, da 3400 (2025-10-02) à 3397 (2026-09-01).
+    expect(lavagens).toHaveLength(11);
+    const datas = lavagens.map((l) => l.dtLavagem);
+    expect(datas).toEqual([...datas].sort());
+    expect(lavagens[0].idLavagem).toBe(3400);
+    expect(lavagens[0].dtLavagem).toBe('2025-10-02');
+    expect(lavagens[lavagens.length - 1].idLavagem).toBe(3397);
+    expect(lavagens[lavagens.length - 1].dtLavagem).toBe('2026-09-01');
   });
 
   it('ordena no cliente mesmo quando o client devolve fora de ordem (robustez)', async () => {

@@ -16,6 +16,7 @@
 // Contrato HTTP (REST sobre `baseUrl` = VITE_API_URL, Req. 11.1), implementado
 // por `services/api` (Lambdas) e registrado em `infra/lib/stacks/api-stack.ts`:
 //
+//   GET    /veiculos                                    → Veiculo[]      (seleção do veículo)
 //   GET    /veiculos/{idVeiculo}                        → Veiculo        (R16)
 //   GET    /tipos-lavagem                               → TipoLavagem[]  (Req. 4.5)
 //   GET    /postos                                      → Posto[]        (Req. 6.6)
@@ -136,6 +137,11 @@ export class HttpLavagemClient implements LavagemClient {
   async listarLavagens(idVeiculo: number): Promise<Lavagem[]> {
     // R19/R20
     return this.requisicao<Lavagem[]>(`/veiculos/${idVeiculo}/lavagens`);
+  }
+
+  async listarVeiculos(): Promise<Veiculo[]> {
+    // Seleção do veículo (frota)
+    return this.requisicao<Veiculo[]>(`/veiculos`);
   }
 
   async obterVeiculo(idVeiculo: number): Promise<Veiculo> {

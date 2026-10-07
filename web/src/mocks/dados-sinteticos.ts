@@ -1,85 +1,101 @@
 // mocks/dados-sinteticos.ts
 //
 // Dados sintéticos 100% fictícios para a demo/dev sem backend (Req. 11.3).
-// Derivados de `docs/lavagem-sintetico.sql`, mapeados para os tipos do contrato
-// (`api/types.ts`) em camelCase. O veículo 101 contém ao menos uma lavagem,
-// como exige o Req. 11.3, para exercitar a listagem (R19/R20) e o fluxo
-// "ver o resultado na tela" (R23) a partir do mock.
+//
+// Fonte única: `data/seed/demo/itens.json`, gerado por `data/seed/gerar-seed.mjs`
+// (semente fixa) já no formato da tabela única do DynamoDB (PK/SK). Aqui apenas
+// ADAPTAMOS esses itens para os tipos do contrato (`api/types.ts`, camelCase):
+//  - booleanos `propriaUnidade`/`postoConveniado` → 'S' | 'N';
+//  - `null` → campo ausente (R10/R13/R14: ramos ocultos são omitidos);
+//  - textos sem acento do seed ("Higienizacao") → acentuados para exibição.
+//
+// O conjunto `demo` contém o `gabarito` (veículos 101–103, lavagens 3397–3399)
+// mais 15 veículos, 6 postos conveniados e ~250 lavagens (Out/2025 a Set/2026).
+// Sem CPF, sem nomes de pessoas: o cadastrador é só um ID (LGPD / OT 17).
 
-import type { Lavagem, Posto, TipoLavagem, Veiculo } from '../api/types';
+import type { Lavagem, Posto, SimNao, TipoLavagem, Veiculo } from '../api/types';
+import itensSeed from '../../../data/seed/demo/itens.json';
 
-// --- Veículos (mock de FR_VEICULO_MOCK) --------------------------------------
+/** Item bruto do seed (união frouxa; filtramos por `entityType`). */
+interface ItemSeed {
+  PK: string;
+  SK: string;
+  entityType: string;
+  [campo: string]: unknown;
+}
+
+const itens = itensSeed as unknown as ItemSeed[];
+
+const porTipo = (tipo: string) => itens.filter((i) => i.entityType === tipo);
+
+/** Restaura acentos de textos do seed que foram gerados sem acentuação. */
+function acentuar(texto: string): string {
+  return texto
+    .replace('Higienizacao', 'Higienização')
+    .replace('Lava-Rapido', 'Lava-Rápido');
+}
+
+const simNao = (b: unknown): SimNao => (b ? 'S' : 'N');
+const opcional = <T>(v: T | null | undefined): T | undefined =>
+  v === null || v === undefined ? undefined : v;
+
+// --- Veículos (cadastro mock de veículos) ------------------------------------
 // kmAtual é a referência read-only exibida no painel (R16).
-export const VEICULOS: Veiculo[] = [
-  { idVeiculo: 101, descricao: 'Fiat Cronos de placa ABC1D23', kmAtual: 45210 },
-  { idVeiculo: 102, descricao: 'VW Voyage de placa DEF2G45', kmAtual: 88750 },
-  { idVeiculo: 103, descricao: 'Chevrolet Onix de placa HIJ3K67', kmAtual: 12030 },
-];
+export const VEICULOS: Veiculo[] = porTipo('VEICULO')
+  .map((i) => ({
+    idVeiculo: i.idVeiculo as number,
+    descricao: acentuar(i.dsVeiculo as string),
+    kmAtual: i.kmAtual as number,
+    placa: i.placa as string,
+    marca: i.marca as string,
+    modelo: i.modelo as string,
+    ano: i.ano as number,
+  }))
+  .sort((a, b) => a.idVeiculo - b.idVeiculo);
 
 // --- Tipos de lavagem (FR_TIPO_LAVAGEM) --------------------------------------
-export const TIPOS_LAVAGEM: TipoLavagem[] = [
-  { idTipoLavagem: 1, descricao: 'Simples' },
-  { idTipoLavagem: 2, descricao: 'Completa' },
-  { idTipoLavagem: 3, descricao: 'Higienização interna' },
-];
+export const TIPOS_LAVAGEM: TipoLavagem[] = porTipo('TIPO_LAVAGEM')
+  .map((i) => ({
+    idTipoLavagem: i.idTipoLavagem as number,
+    descricao: acentuar(i.dsTipoLavagem as string),
+  }))
+  .sort((a, b) => a.idTipoLavagem - b.idTipoLavagem);
 
-// --- Postos conveniados (FR_POSTO_MOCK) --------------------------------------
-export const POSTOS: Posto[] = [
-  { idPosto: 10, nome: 'Auto Posto Central (conveniado)' },
-  { idPosto: 11, nome: 'Lava-Rápido Norte (conveniado)' },
-];
+// --- Postos conveniados (cadastro mock de postos) ----------------------------
+export const POSTOS: Posto[] = porTipo('POSTO')
+  .map((i) => ({
+    idPosto: i.idPosto as number,
+    nome: acentuar(i.nmPosto as string),
+  }))
+  .sort((a, b) => a.idPosto - b.idPosto);
 
 // --- Lavagens iniciais (FR_LAVAGEM) ------------------------------------------
-// IDs seguem a sequence sintética (FR_LAVAGEM_SEQ START WITH 3397). O veículo
-// 101 tem duas lavagens para exercitar a ordenação por data (R19/R20); os
-// demais veículos também têm exemplos para variar a demo.
-export const LAVAGENS_INICIAIS: Lavagem[] = [
-  // 101 — externa, posto conveniado (tem idPosto, sem dsPosto/cnpj) — R12/R13
-  {
-    idLavagem: 3397,
-    idVeiculo: 101,
-    idTipoLavagem: 2,
-    dtLavagem: '2026-09-01',
-    kmLavagem: 45000,
-    propriaUnidade: 'N',
-    vlLavagem: 60.0,
-    postoConveniado: 'S',
-    idPosto: 10,
-  },
-  // 101 — interna, na própria unidade (sem valor/posto) — R09/R10
-  {
-    idLavagem: 3400,
-    idVeiculo: 101,
-    idTipoLavagem: 1,
-    dtLavagem: '2026-08-20',
-    kmLavagem: 44120,
-    propriaUnidade: 'S',
-  },
-  // 102 — externa, posto NÃO conveniado (dsPosto + cnpj, sem idPosto) — R14
-  {
-    idLavagem: 3398,
-    idVeiculo: 102,
-    idTipoLavagem: 1,
-    dtLavagem: '2026-09-03',
-    kmLavagem: 88800,
-    propriaUnidade: 'N',
-    vlLavagem: 35.0,
-    postoConveniado: 'N',
-    dsPosto: 'Lava-Jato do Zé',
-    cnpjPosto: '12.345.678/0001-90',
-  },
-  // 103 — interna, na própria unidade — R09/R10
-  {
-    idLavagem: 3399,
-    idVeiculo: 103,
-    idTipoLavagem: 3,
-    dtLavagem: '2026-09-05',
-    kmLavagem: 12050,
-    propriaUnidade: 'S',
-  },
-];
+// O cadastrador (idPessoaCadastrador) e a data de cadastro NÃO entram no
+// contrato do front: R08 define o cadastrador pelo token, no backend.
+export const LAVAGENS_INICIAIS: Lavagem[] = porTipo('LAVAGEM').map((i) => {
+  const propriaUnidade = Boolean(i.propriaUnidade);
+  const lavagem: Lavagem = {
+    idLavagem: i.idLavagem as number,
+    idVeiculo: i.idVeiculo as number,
+    idTipoLavagem: i.idTipoLavagem as number,
+    dtLavagem: i.dtLavagem as string,
+    kmLavagem: i.kmLavagem as number,
+    propriaUnidade: simNao(propriaUnidade),
+  };
+  // Ramo externo (R11–R14): valor + posto conveniado OU descrição + CNPJ.
+  if (!propriaUnidade) {
+    lavagem.vlLavagem = opcional(i.vlLavagem as number | null);
+    lavagem.postoConveniado = simNao(i.postoConveniado);
+    lavagem.idPosto = opcional(i.idPosto as number | null);
+    lavagem.dsPosto = opcional(i.dsPosto as string | null);
+    lavagem.cnpjPosto = opcional(i.cnpjPosto as string | null);
+  }
+  return lavagem;
+});
 
 // Próximo id a emitir pelo mock ao criar uma lavagem (R01 no backend; aqui o
-// mock gera por incremento). Começa acima do maior id inicial.
+// mock gera por incremento). Acima do contador do seed e do maior id existente.
+const ultimoIdContador =
+  (itens.find((i) => i.entityType === 'CONTADOR')?.ultimoId as number | undefined) ?? 0;
 export const PROXIMO_ID_LAVAGEM =
-  Math.max(...LAVAGENS_INICIAIS.map((l) => l.idLavagem ?? 0)) + 1;
+  Math.max(ultimoIdContador, ...LAVAGENS_INICIAIS.map((l) => l.idLavagem ?? 0)) + 1;

@@ -11,6 +11,11 @@ export function veiculoParaDto(item: Item): VeiculoDto {
     idVeiculo: num(item.idVeiculo),
     descricao: texto(item.dsVeiculo),
     kmAtual: num(item.kmAtual), // R16
+    // Identificação exibida na tela (somente leitura).
+    ...(typeof item.placa === 'string' && { placa: item.placa }),
+    ...(typeof item.marca === 'string' && { marca: item.marca }),
+    ...(typeof item.modelo === 'string' && { modelo: item.modelo }),
+    ...(typeof item.ano === 'number' && { ano: item.ano }),
   };
 }
 

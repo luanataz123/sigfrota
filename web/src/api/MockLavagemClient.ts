@@ -103,6 +103,12 @@ export class MockLavagemClient implements LavagemClient {
     return clone(ordenarPorData(doVeiculo));
   }
 
+  async listarVeiculos(): Promise<Veiculo[]> {
+    await this.atraso();
+    this.talvezFalhar();
+    return clone(this.veiculos);
+  }
+
   async obterVeiculo(idVeiculo: number): Promise<Veiculo> {
     await this.atraso();
     this.talvezFalhar();

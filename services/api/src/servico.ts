@@ -196,6 +196,12 @@ export class ServicoLavagens {
 
   // --- catálogo -------------------------------------------------------------
 
+  /** Frota para a tela de seleção do veículo, ordenada por ID. */
+  async listarVeiculos(): Promise<VeiculoDto[]> {
+    const itens = await this.repo.consultar(chaves.catalogo, 'VEICULO#');
+    return itens.map(veiculoParaDto).sort((a, b) => a.idVeiculo - b.idVeiculo);
+  }
+
   /** R16 (Km Atual) e R06 (veículo existe). */
   async obterVeiculo(idVeiculo: number): Promise<VeiculoDto> {
     const item = await this.repo.obter(chaves.catalogo, chaves.veiculo(idVeiculo));
