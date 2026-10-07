@@ -77,6 +77,34 @@ export function Migalhas({ itens }: { itens: MigalhaItem[] }) {
   );
 }
 
+/** Botão "Voltar": link para a tela anterior lógica (rota fixa, sem depender do histórico). */
+export function BotaoVoltar({ to, rotulo }: { to: string; rotulo: string }) {
+  return (
+    <Link to={to} className="btn-secondary px-3 py-1.5">
+      <span aria-hidden="true">←</span>
+      {rotulo}
+    </Link>
+  );
+}
+
+/** Linha de navegação: botão voltar à esquerda e breadcrumb ao lado. */
+export function BarraNavegacao({
+  voltarPara,
+  voltarRotulo,
+  itens,
+}: {
+  voltarPara: string;
+  voltarRotulo: string;
+  itens: MigalhaItem[];
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-4">
+      <BotaoVoltar to={voltarPara} rotulo={voltarRotulo} />
+      <Migalhas itens={itens} />
+    </div>
+  );
+}
+
 /** Iniciais do nome para o avatar do usuário. */
 function iniciais(nome: string): string {
   return nome
