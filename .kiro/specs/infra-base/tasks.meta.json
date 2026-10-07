@@ -31,6 +31,331 @@
         "chatSessionId": "sess_6594d59c-3474-41c4-bb52-6f555f3a17c0",
         "timestamp": 1791386195827
       }
+    ],
+    "2.1 Criar o construto `Tabela` (`lib/constructs/dados.ts`)": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386711945
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386750285
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386864091
+      }
+    ],
+    "3.1 Criar o construto `Autenticacao` (`lib/constructs/autenticacao.ts`)": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386712093
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386876933
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387119042
+      }
+    ],
+    "4.1 Criar o construto `Api` (`lib/constructs/api.ts`)": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386712226
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386877935
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387120242
+      }
+    ],
+    "5.1 Criar o construto `Front` (`lib/constructs/front.ts`)": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386712347
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386878429
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387122071
+      }
+    ],
+    "6.1 Criar `lib/constructs/funcao-lambda.ts` e `test/fixtures/handler.ts`": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386712458
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386879041
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387123579
+      }
+    ],
+    "7.1 Implementar `SigfrotaBaseStack` (`lib/stacks/base-stack.ts`)": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386712587
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387353067
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387599271
+      }
+    ],
+    "7.2 Implementar `ContratoInfra` e `registrarRota()` (`lib/contrato.ts`)": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386712780
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387130748
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387351535
+      }
+    ],
+    "8.1 Implementar `lib/nag.ts` com as supressões justificadas": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386712882
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387601059
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387956152
+      }
+    ],
+    "9. Checkpoint — synth e testes": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386713005
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387956361
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388090271
+      }
+    ],
+    "10.1 Implementar `scripts/criar-usuarios.mjs`": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386713131
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388091704
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388229503
+      }
+    ],
+    "10.2 Implementar `scripts/gerar-env-web.mjs`": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386713259
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388092927
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388231061
+      }
+    ],
+    "11. Escrever o `infra/README.md`": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386713369
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388232055
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388414727
+      }
+    ],
+    "12.1 Implantar a stack": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386713482
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388415405
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388835028
+      }
+    ],
+    "12.2 Executar a verificação manual": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386713609
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388835355
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388943566
+      }
+    ],
+    "13. Checkpoint final": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386713719
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388945024
+      },
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791389058427
+      }
+    ],
+    "1. Estruturar o monorepo e o projeto CDK": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386737658
+      }
+    ],
+    "2. Implementar a tabela DynamoDB": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791386864231
+      }
+    ],
+    "3. Implementar a autenticação com Cognito": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387119192
+      }
+    ],
+    "4. Implementar a HTTP API": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387120400
+      }
+    ],
+    "5. Implementar a hospedagem do front": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387122232
+      }
+    ],
+    "6. Implementar o construto `FuncaoLambda`": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387123739
+      }
+    ],
+    "7. Montar a stack base e o contrato de infra": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387599438
+      }
+    ],
+    "8. Aplicar a conformidade com o `cdk-nag`": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791387956537
+      }
+    ],
+    "10. Criar os scripts de apoio": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388231239
+      }
+    ],
+    "12. Implantar e verificar na conta": [
+      {
+        "executionId": "a382cdac-796f-46b9-a15a-24766a0d24fb",
+        "chatSessionId": "sess_d103872c-e36f-4c2c-bf07-5e6403b5eb9d",
+        "timestamp": 1791388943719
+      }
     ]
   }
 }

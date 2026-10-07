@@ -27,6 +27,22 @@ export function calcularSufixo(conta: string): string {
   return createHash('sha256').update(conta).digest('hex').slice(0, 8);
 }
 
+/**
+ * Prefixo do domínio de login do Cognito: `sigfrota-<sufixo>` (Requisitos 2.3 e 4.8).
+ * Fonte única usada pelo Cognito e pela CSP do CloudFront.
+ */
+export function prefixoDominioCognito(conta: string): string {
+  return `${PREFIXO}-${calcularSufixo(conta)}`;
+}
+
+/**
+ * URL do domínio de login gerenciado do Cognito, ex.:
+ * `https://sigfrota-1a2b3c4d.auth.us-east-1.amazoncognito.com`.
+ */
+export function urlDominioCognito(conta: string): string {
+  return `https://${prefixoDominioCognito(conta)}.auth.${REGIAO}.amazoncognito.com`;
+}
+
 /** Opções de criação do app CDK. */
 export interface OpcoesCriarApp {
   /** ID da conta AWS. Padrão: `process.env.CDK_DEFAULT_ACCOUNT`. */

@@ -5,7 +5,7 @@
   "description": "Infraestrutura como código (AWS CDK) do SIG Frota — módulo de Lavagem",
   "scripts": {
     "bootstrap": "cdk bootstrap --profile hackaton",
-    "synth": "cdk synth --all --profile hackaton",
+    "synth": "cdk synth --profile hackaton",
     "deploy": "cdk deploy --all --require-approval never --profile hackaton",
     "destroy": "cdk destroy --all --force --profile hackaton",
     "test": "vitest run",
