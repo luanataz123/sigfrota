@@ -32,7 +32,7 @@
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '../../app/ToastRegion';
-import { AppShell, Migalhas } from '../../components/AppShell';
+import { AppShell, BarraNavegacao } from '../../components/AppShell';
 import { PlacaVeiculo } from '../../components/PlacaVeiculo';
 import { PainelLavagens } from './PainelLavagens';
 import { useVeiculo } from './useLavagens';
@@ -104,7 +104,9 @@ export function VeiculoPage() {
         </p>
       ) : (
         <main className="flex flex-col gap-6">
-          <Migalhas
+          <BarraNavegacao
+            voltarPara="/veiculos"
+            voltarRotulo="Voltar para a frota"
             itens={[
               { rotulo: 'Frota', to: '/veiculos' },
               { rotulo: `Veículo ${idVeiculo}` },

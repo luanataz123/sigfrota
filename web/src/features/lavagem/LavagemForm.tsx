@@ -64,6 +64,8 @@ export interface LavagemFormProps {
    * Default `false` para não afetar quem usa o formulário sem mutação.
    */
   enviando?: boolean;
+  /** Quando informado, exibe o botão "Cancelar" (volta sem salvar). */
+  onCancelar?: () => void;
 }
 
 /** Opções Sim/Não para os toggles "Na própria unidade?" / "Posto conveniado?". */
@@ -91,6 +93,7 @@ export function LavagemForm({
   valoresIniciais,
   onSubmit,
   enviando = false,
+  onCancelar,
 }: LavagemFormProps) {
   const {
     register,
@@ -283,11 +286,12 @@ export function LavagemForm({
 
       {/* Botão Salvar — durante o envio (Req. 8.6) fica desabilitado e indica o
           progresso ("Salvando…" + spinner), evitando envio duplicado. */}
+      <div className="flex flex-wrap items-center gap-3">
       <button
         type="submit"
         disabled={enviando}
         aria-busy={enviando}
-        className="btn-primary self-start px-6"
+        className="btn-primary px-6"
       >
         {enviando && (
           <Spinner
@@ -298,6 +302,12 @@ export function LavagemForm({
         )}
         {enviando ? 'Salvando…' : 'Salvar'}
       </button>
+      {onCancelar && (
+        <button type="button" onClick={onCancelar} disabled={enviando} className="btn-secondary px-6">
+          Cancelar
+        </button>
+      )}
+      </div>
     </form>
   );
 }

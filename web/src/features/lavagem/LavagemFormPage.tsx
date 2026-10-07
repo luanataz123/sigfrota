@@ -44,7 +44,7 @@ import type { ValoresFormularioLavagem } from '../../lib/validationResolver';
 import type { VeiculoPageState } from '../veiculo/VeiculoPage';
 import { Spinner } from '../../components/Spinner';
 import { ErrorState } from '../../components/ErrorState';
-import { BarraSuperior, Migalhas } from '../../components/AppShell';
+import { BarraNavegacao, BarraSuperior } from '../../components/AppShell';
 import { PlacaVeiculo } from '../../components/PlacaVeiculo';
 import { useVeiculo } from '../veiculo/useLavagens';
 import { LavagemForm } from './LavagemForm';
@@ -112,11 +112,13 @@ export function LavagemFormPage() {
           idVeiculo={idVeiculo}
           idLavagem={idLavagem!}
           onSucesso={(mensagem) => voltarAoPainel(idVeiculo, mensagem)}
+          onCancelar={() => navigate(`/veiculos/${idVeiculo}`)}
         />
       ) : (
         <FormularioInclusao
           idVeiculo={idVeiculo}
           onSucesso={(mensagem) => voltarAoPainel(idVeiculo, mensagem)}
+          onCancelar={() => navigate(`/veiculos/${idVeiculo}`)}
         />
       )}
     </LayoutFormulario>
@@ -148,7 +150,9 @@ function LayoutFormulario({
       <BarraSuperior />
       <main className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-8">
         {idVeiculo !== undefined && (
-          <Migalhas
+          <BarraNavegacao
+            voltarPara={`/veiculos/${idVeiculo}`}
+            voltarRotulo="Voltar para o veículo"
             itens={[
               { rotulo: 'Frota', to: '/veiculos' },
               { rotulo: `Veículo ${idVeiculo}`, to: `/veiculos/${idVeiculo}` },
@@ -188,9 +192,11 @@ function IdentificacaoVeiculo({ idVeiculo }: { idVeiculo: number }) {
 function FormularioInclusao({
   idVeiculo,
   onSucesso,
+  onCancelar,
 }: {
   idVeiculo: number;
   onSucesso: (mensagem: string) => void;
+  onCancelar: () => void;
 }) {
   const { criar } = useLavagemMutations(idVeiculo);
   const { mostrarToast } = useToast();
@@ -216,6 +222,7 @@ function FormularioInclusao({
       idVeiculo={idVeiculo}
       onSubmit={aoEnviar}
       enviando={criar.isPending}
+      onCancelar={onCancelar}
     />
   );
 }
@@ -230,10 +237,12 @@ function FormularioEdicao({
   idVeiculo,
   idLavagem,
   onSucesso,
+  onCancelar,
 }: {
   idVeiculo: number;
   idLavagem: number;
   onSucesso: (mensagem: string) => void;
+  onCancelar: () => void;
 }) {
   const client = useLavagemClient();
   const { atualizar, excluir } = useLavagemMutations(idVeiculo);
@@ -309,6 +318,7 @@ function FormularioEdicao({
         valoresIniciais={valoresIniciais}
         onSubmit={aoEnviar}
         enviando={atualizar.isPending}
+        onCancelar={onCancelar}
       />
 
       {/* Tarefa 8.4 / Req. 9.1: ação "Excluir" disponível apenas no modo edição.
