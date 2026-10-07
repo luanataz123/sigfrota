@@ -1,0 +1,11 @@
+{
+  "name": "sigfrota",
+  "private": true,
+  "description": "SIG Frota — módulo de Lavagem (monorepo)",
+  "workspaces": [
+    "infra",
+    "packages/*",
+    "services/*",
+    "web"
+  ]
+}
